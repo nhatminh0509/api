@@ -8,7 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017/dev_api?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false'),
+    MongooseModule.forRoot(process.env.MONGOO_URI),
     UsersModule, 
     OrgsModule],
   controllers: [AppController],
