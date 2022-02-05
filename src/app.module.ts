@@ -8,7 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://nhatminh0509:nhaT0509@kathena-demo-shard-00-00.26nei.mongodb.net:27017,kathena-demo-shard-00-01.26nei.mongodb.net:27017,kathena-demo-shard-00-02.26nei.mongodb.net:27017/test?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=true'),
+    MongooseModule.forRoot('mongodb://nhatminh0509:nhaT0509@kathena-demo-shard-00-00.26nei.mongodb.net:27017,kathena-demo-shard-00-01.26nei.mongodb.net:27017,kathena-demo-shard-00-02.26nei.mongodb.net:27017/api?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=true'),
     UsersModule, 
     OrgsModule],
   controllers: [AppController],
