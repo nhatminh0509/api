@@ -6,13 +6,16 @@ import { UsersModule } from './users/users.module';
 import { OrgsModule } from './orgs/orgs.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FilesModule } from './files/files.module';
+import { AuthModule } from './auth/auth.module';
+import config from './common/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://nhatminh0509:nhaT0509@kathena-demo-shard-00-00.26nei.mongodb.net:27017,kathena-demo-shard-00-01.26nei.mongodb.net:27017,kathena-demo-shard-00-02.26nei.mongodb.net:27017/api?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=true'),
+    MongooseModule.forRoot(config.MONGO_URI),
     UsersModule, 
     OrgsModule,
     FilesModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

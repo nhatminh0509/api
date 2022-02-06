@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { isValidObjectId, Model, ObjectId } from 'mongoose';
+import { isEmail } from 'class-validator';
 import { SoftDeleteModel } from 'mongoose-delete';
+import { checkObjectId } from 'src/common/function';
 import HTTP_STATUS from 'src/common/httpStatus';
 import { User, UserDocument } from './users.model';
 import { CreateUserInput, UpdateUserInput } from './users.type';
+import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
@@ -13,6 +15,10 @@ export class UsersService {
   async create(input: CreateUserInput) {
     const model = new this.userModel({
       ...input,
+      password: bcrypt.hashSync(
+        input.password || '@admin',
+        10,
+      ),
     })
     const userCreated = await model.save()
     return userCreated
@@ -25,24 +31,35 @@ export class UsersService {
     }
   }
 
-  async findOne(slugOrId: string) {
+  async findOne(field: string) {
     let model = null
-    if (isValidObjectId(slugOrId)){
-      model = await this.userModel.findById(slugOrId)
+    if (checkObjectId(field)){
+      model = await this.userModel.findById(field)
+    } else if (isEmail(field)) {
+      model = await this.userModel.findOne({ email: field })
     } else {
-      model = await this.userModel.findOne({ slug: slugOrId })
+      model = await this.userModel.findOne({ username: field })
     }
     if (!model) throw HTTP_STATUS.NOT_FOUND('User not found')
     return model
   }
 
 
-  async update(slugOrId: string, updateInput: UpdateUserInput) {
+  async update(field: string, input: UpdateUserInput) {
     let user = null
-    if (isValidObjectId(slugOrId)){
-      user = await this.userModel.findByIdAndUpdate(slugOrId, updateInput)
+    let updateInput = { ...input }
+    if (input.password) {
+      updateInput.password = bcrypt.hashSync(
+        input.password || '@admin',
+        10,
+      )
+    }
+    if (checkObjectId(field)){
+      user = await this.userModel.findByIdAndUpdate(field, updateInput)
+    } else if (isEmail(field)) {
+      user = await this.userModel.findOneAndUpdate({ email: field }, updateInput)
     } else {
-      user = await this.userModel.findOneAndUpdate({ slug: slugOrId }, updateInput)
+      user = await this.userModel.findOneAndUpdate({ username: field }, updateInput)
     }
     if (!user) throw HTTP_STATUS.NOT_FOUND('User not found')
     const updated = await this.findOne(user._id)
@@ -51,7 +68,7 @@ export class UsersService {
 
   async remove(slugOrId: string) {
     let res = null
-    if (isValidObjectId(slugOrId)){
+    if (checkObjectId(slugOrId)){
       res = await this.userModel.delete({
         id: slugOrId
       })

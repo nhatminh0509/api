@@ -2,7 +2,8 @@ import { Controller, Get, Req } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { AppService } from './app.service'
-import { CurrentOrg, CurrentUser } from './common/decorator'
+import { CurrentOrgDomain, CurrentUser } from './auth/auth.decorator'
+import config from './common/config'
 
 @ApiTags('HOME')
 @Controller()
@@ -14,8 +15,11 @@ export class AppController {
     name: 'string',
     in: 'query'
   }] })
-  getHello(@Req() request: Request, @CurrentOrg() currentOrg: string) {
-    console.log(currentOrg)
-    return this.appService.getHello()
+  getHello(@Req() request: Request, @CurrentOrgDomain() currentOrgDomain: string) {
+    console.log(currentOrgDomain)
+    return {
+      currentOrgDomain,
+      test: config.test
+    }
   }
 }

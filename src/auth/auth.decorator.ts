@@ -7,10 +7,9 @@ export const CurrentUser = createParamDecorator(
   }
 )
 
-export const CurrentOrg = createParamDecorator(
+export const CurrentOrgDomain = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest()
-    console.log(request)
-    return '123'
+    return request.headers.origin || ''
   }
 )
