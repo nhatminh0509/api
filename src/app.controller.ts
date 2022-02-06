@@ -18,8 +18,7 @@ export class AppController {
   getHello(@Req() request: Request, @CurrentOrgDomain() currentOrgDomain: string) {
     console.log(currentOrgDomain)
     return {
-      currentOrgDomain,
-      test: config.test
+      currentOrgDomain
     }
   }
 }

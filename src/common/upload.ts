@@ -1,9 +1,10 @@
 import * as cloudinary from 'cloudinary'
+import config from './config';
 
 cloudinary.v2.config({ 
-  cloud_name: 'dofaz5gop', 
-  api_key: '172273429757555', 
-  api_secret: 'HWZt2ndXpmRrykCnSwQZliu63n0',
+  cloud_name: config.CLOUDINARY_CLOUD_NAME, 
+  api_key: config.CLOUDINARY_API_KEY, 
+  api_secret: config.CLOUDINARY_API_SECRET,
   secure: true
 });
 
