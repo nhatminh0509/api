@@ -1,22 +1,20 @@
 import { Controller, Get, Req } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiHeader, ApiHeaders, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { AppService } from './app.service'
-import { CurrentOrgDomain, CurrentUser } from './auth/auth.decorator'
+import { CurrentOrgDomain, CurrentUser, UseAuthGuard } from './auth/auth.decorator'
 import config from './common/config'
 
 @ApiTags('HOME')
 @Controller()
+@ApiBearerAuth('JWT') 
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Hello', parameters: [{
-    name: 'string',
-    in: 'query'
-  }] })
-  getHello(@Req() request: Request, @CurrentOrgDomain() currentOrgDomain: string) {
-    console.log(currentOrgDomain)
+  @UseAuthGuard()
+  getHello(@Req() request: Request, @CurrentOrgDomain() currentOrgDomain: string, @CurrentUser() user) {
+    console.log(user)
     return {
       currentOrgDomain
     }

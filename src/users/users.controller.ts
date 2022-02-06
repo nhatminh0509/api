@@ -8,7 +8,7 @@ import {
   Put,
   Req,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UsersService } from './users.service';
 import { CreateUserInput, UpdateUserInput } from './users.type';
