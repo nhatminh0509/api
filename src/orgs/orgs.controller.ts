@@ -7,11 +7,12 @@ import {
   Delete,
   Put,
   Req,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { OrgsService } from './orgs.service';
-import { CreateOrgInput, UpdateOrgInput } from './orgs.type';
+import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './orgs.type';
 
 @ApiTags('Orgs')
 @Controller('orgs')
@@ -24,8 +25,8 @@ export class OrgsController {
   }
 
   @Get()
-  findAll() {
-    return this.orgsService.findAll();
+  findAll(@Query() query: QueryListOrg) {
+    return this.orgsService.findAll(query);
   }
 
   @Get('/config')

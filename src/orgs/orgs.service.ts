@@ -5,11 +5,13 @@ import { SoftDeleteModel } from 'mongoose-delete';
 import HTTP_STATUS from 'src/common/httpStatus';
 import { generateSlug } from 'src/common/function';
 import { Org, OrgDocument } from './orgs.model';
-import { CreateOrgInput, UpdateOrgInput } from './orgs.type';
+import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './orgs.type';
 
 @Injectable()
 export class OrgsService {
-  constructor(@InjectModel(Org.name) private orgModel: SoftDeleteModel<OrgDocument>) {}
+  constructor(@InjectModel(Org.name) private orgModel: SoftDeleteModel<OrgDocument>) {
+    this.orgModel.createIndexes()
+  }
 
   async create(input: CreateOrgInput) {
     const org = new this.orgModel({
@@ -20,10 +22,44 @@ export class OrgsService {
     return orgCreated
   }
 
-  async findAll() {
+  async findAll(query: QueryListOrg) {
+    const { domain, owner, searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    let sort = {
+      [orderBy]: direction === 'asc' ? 1 : -1
+    }
+    let data = []
+    let total = 0
+    let condition = {}
+
+    if(searchText) { 
+      condition = {
+        ...condition,
+        $text: { $search: searchText }
+      }
+    }
+
+    if (owner) {
+      condition = {
+        ...condition,
+        owner
+      }
+    }
+    
+    if (domain) {
+      condition = {
+        ...condition,
+        domain
+      }
+    }
+
+    data = await this.orgModel.find(condition).sort(sort).skip(skip).limit(limit)
+    total = await this.orgModel.countDocuments(condition)
+    
     return {
-      data: await this.orgModel.find(),
-      total: await this.orgModel.countDocuments()
+      data,
+      total,
+      skip: Number(skip),
+      limit: Number(limit)
     }
   }
   
@@ -47,10 +83,14 @@ export class OrgsService {
 
   async update(slugOrId: string, updateInput: UpdateOrgInput) {
     let org = null
+    let updateData = { ...updateInput } as any
+    if (updateData.name) {
+      updateData.slug = generateSlug(updateData.name)
+    }
     if (isValidObjectId(slugOrId)){
-      org = await this.orgModel.findByIdAndUpdate(slugOrId, updateInput)
+      org = await this.orgModel.findByIdAndUpdate(slugOrId, updateData)
     } else {
-      org = await this.orgModel.findOneAndUpdate({ slug: slugOrId }, updateInput)
+      org = await this.orgModel.findOneAndUpdate({ slug: slugOrId }, updateData)
     }
     if (!org) throw HTTP_STATUS.NOT_FOUND('Org not found')
     const updated = await this.findOne(org._id)

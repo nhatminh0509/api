@@ -5,7 +5,7 @@ export type OrgDocument = Org & MongooseDelete.SoftDeleteDocument
 
 @Schema({ timestamps: true })
 export class Org {
-  @Prop({ required: true })
+  @Prop({ required: true, index: 'text' })
   name: string
   
   @Prop({ required: true, unique: true })
@@ -14,9 +14,6 @@ export class Org {
   @Prop({ required: true })
   owner: string
 
-  @Prop({ default: [] })
-  managers: string[]
-
   @Prop({ required: true, unique: true })
   slug: string
 
@@ -24,5 +21,5 @@ export class Org {
   siteSetting: object
 }
 
-export const OrgSchema = SchemaFactory.createForClass(Org)
+export const OrgSchema = SchemaFactory.createForClass(Org).index({ name: 'text' })
 OrgSchema.plugin(MongooseDelete, { overrideMethods: 'all' })

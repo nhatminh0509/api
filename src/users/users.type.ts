@@ -1,32 +1,54 @@
 import { ApiProperty } from "@nestjs/swagger"
+import { User, UserStatus } from "./users.model"
 
-export class CreateOrgInput {
+export class CreateUserInput {
     @ApiProperty({ required: true })
-    name: string
+    displayName: string
     
     @ApiProperty({ required: true })
-    domain: string
+    username: string
 
     @ApiProperty({ required: true })
-    owner: string
+    password: string
     
     @ApiProperty({ required: false })
-    managers?: string[]
+    avatar?: string
     
+    @ApiProperty({ required: true })
+    email: string
+    
+    @ApiProperty({ required: true })
+    phone: string
+
     @ApiProperty({ required: false })
-    siteSetting?: object
+    roles?: object
+    
+    @ApiProperty({ required: true, enum: UserStatus })
+    status: UserStatus
 }
 
-export class UpdateOrgInput {
+export class UpdateUserInput {
     @ApiProperty({ required: false })
-    name?: string
+    displayName?: string
     
     @ApiProperty({ required: false })
-    domain?: string
+    username?: string
 
     @ApiProperty({ required: false })
-    owner?: string
+    password?: string
     
     @ApiProperty({ required: false })
-    managers?: string[]
+    avatar?: string
+    
+    @ApiProperty({ required: false })
+    email?: string
+    
+    @ApiProperty({ required: false })
+    phone?: string
+
+    @ApiProperty({ required: false })
+    roles?: object
+    
+    @ApiProperty({ required: false, enum: UserStatus })
+    status?: UserStatus
 }

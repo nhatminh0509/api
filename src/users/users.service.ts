@@ -1,23 +1,21 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model, ObjectId } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import HTTP_STATUS from 'src/common/httpStatus';
-import { generateSlug } from 'src/common/function';
 import { User, UserDocument } from './users.model';
-import { CreateOrgInput, UpdateOrgInput } from './users.type';
+import { CreateUserInput, UpdateUserInput } from './users.type';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>) {}
 
-  async create(input: CreateOrgInput) {
-    const org = new this.userModel({
+  async create(input: CreateUserInput) {
+    const model = new this.userModel({
       ...input,
-      slug: generateSlug(input.name)
     })
-    const orgCreated = await org.save()
-    return orgCreated
+    const userCreated = await model.save()
+    return userCreated
   }
 
   async findAll() {
@@ -26,34 +24,28 @@ export class UsersService {
       total: await this.userModel.countDocuments()
     }
   }
-  
-  async findOneByDomain(domain: string) {
-    const org = await this.userModel.findOne({ domain })
-    if (!org) throw HTTP_STATUS.NOT_FOUND('Domain not found')
-    return org
-  }
 
   async findOne(slugOrId: string) {
-    let org = null
+    let model = null
     if (isValidObjectId(slugOrId)){
-      org = await this.userModel.findById(slugOrId)
+      model = await this.userModel.findById(slugOrId)
     } else {
-      org = await this.userModel.findOne({ slug: slugOrId })
+      model = await this.userModel.findOne({ slug: slugOrId })
     }
-    if (!org) throw HTTP_STATUS.NOT_FOUND('Org not found')
-    return org
+    if (!model) throw HTTP_STATUS.NOT_FOUND('User not found')
+    return model
   }
 
 
-  async update(slugOrId: string, updateInput: UpdateOrgInput) {
-    let org = null
+  async update(slugOrId: string, updateInput: UpdateUserInput) {
+    let user = null
     if (isValidObjectId(slugOrId)){
-      org = await this.userModel.findByIdAndUpdate(slugOrId, updateInput)
+      user = await this.userModel.findByIdAndUpdate(slugOrId, updateInput)
     } else {
-      org = await this.userModel.findOneAndUpdate({ slug: slugOrId }, updateInput)
+      user = await this.userModel.findOneAndUpdate({ slug: slugOrId }, updateInput)
     }
-    if (!org) throw HTTP_STATUS.NOT_FOUND('Org not found')
-    const updated = await this.findOne(org._id)
+    if (!user) throw HTTP_STATUS.NOT_FOUND('User not found')
+    const updated = await this.findOne(user._id)
     return updated
   }
 

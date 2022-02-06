@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import axios from 'axios';
 
 @Injectable()
 export class AppService {
-  getHello(): { a: number; b: number } {
-    return {
-      a: 1,
-      b: 2,
-    };
+  async getHello() {
+    const res = await axios.get('https://dev-api.nftpod.io/setting')
+    return res.data
   }
 }

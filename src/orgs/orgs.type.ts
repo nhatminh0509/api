@@ -1,4 +1,28 @@
 import { ApiProperty } from "@nestjs/swagger"
+import { SORT_DIRECTION } from "src/common/constants"
+
+export class QueryListOrg {
+    @ApiProperty({ required: false })
+    searchText?: string
+    
+    @ApiProperty({ required: false })
+    domain?: string
+    
+    @ApiProperty({ required: false })
+    owner?: string
+    
+    @ApiProperty({ required: false })
+    limit?: number
+
+    @ApiProperty({ required: false })
+    skip?: number
+    
+    @ApiProperty({ required: false })
+    orderBy?: string
+    
+    @ApiProperty({ required: false, default: SORT_DIRECTION.DESC })
+    direction?: SORT_DIRECTION
+}
 
 export class CreateOrgInput {
     @ApiProperty({ required: true })
@@ -9,9 +33,6 @@ export class CreateOrgInput {
 
     @ApiProperty({ required: true })
     owner: string
-    
-    @ApiProperty({ required: false })
-    managers?: string[]
     
     @ApiProperty({ required: false })
     siteSetting?: object
@@ -26,7 +47,4 @@ export class UpdateOrgInput {
 
     @ApiProperty({ required: false })
     owner?: string
-    
-    @ApiProperty({ required: false })
-    managers?: string[]
 }

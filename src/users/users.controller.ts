@@ -11,7 +11,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UsersService } from './users.service';
-import { CreateOrgInput, UpdateOrgInput } from './users.type';
+import { CreateUserInput, UpdateUserInput } from './users.type';
 
 @ApiTags('Users')
 @Controller('users')
@@ -19,7 +19,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() body: CreateOrgInput) {
+  create(@Body() body: CreateUserInput) {
     return this.usersService.create(body);
   }
 
@@ -28,18 +28,13 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get('/config')
-  findOneByDomain(@Req() req: Request) {
-    return this.usersService.findOneByDomain(req.headers.origin);
-  }
-
   @Get(':slugOrId')
   findOne(@Param('slugOrId') slugOrId: string) {
     return this.usersService.findOne(slugOrId);
   }
 
   @Put(':id')
-  update(@Param('id') slugOrId: string, @Body() updateInput: UpdateOrgInput) {
+  update(@Param('id') slugOrId: string, @Body() updateInput: UpdateUserInput) {
     return this.usersService.update(slugOrId, updateInput)
   }
 
