@@ -5,6 +5,8 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { domainToASCII } from 'url';
+import { CurrentOrgDomain } from './auth.decorator';
 import { AuthService } from './auth.service';
 import { SignInInput } from './auth.type';
 
@@ -14,8 +16,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/sign-in')
-  create(@Body() body: SignInInput) {
-    return this.authService.signIn(body)
+  create(@CurrentOrgDomain() domain, @Body() body: SignInInput) {
+    return this.authService.signIn(domain, body)
   }
 
   @Get('/permissions')

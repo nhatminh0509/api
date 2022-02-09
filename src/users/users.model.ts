@@ -32,7 +32,7 @@ export class User {
   @Prop({ enum: UserStatus, type: String, default: UserStatus.Pending, index: true })
   status: UserStatus
 
-  @Prop({ type: Object })
+  @Prop({ type: Object, default: {} })
   roles: object
 
   @Prop({ required: false, type: Date, default: null })

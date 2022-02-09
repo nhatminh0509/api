@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiHeader, ApiHeaders, ApiOperation, ApiTags } from '@ne
 import { Request } from 'express'
 import { AppService } from './app.service'
 import { CurrentOrgDomain, CurrentUser, UseAuthGuard } from './auth/auth.decorator'
+import Permissions from './auth/permissions'
 import config from './common/config'
 
 @ApiTags('HOME')
@@ -12,11 +13,11 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @UseAuthGuard()
+  @UseAuthGuard(Permissions.Hr_Access)
   getHello(@Req() request: Request, @CurrentOrgDomain() currentOrgDomain: string, @CurrentUser() user) {
-    console.log(user)
     return {
-      currentOrgDomain
+      currentOrgDomain,
+      user
     }
   }
 }

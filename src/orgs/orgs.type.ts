@@ -20,7 +20,7 @@ export class QueryListOrg {
     @ApiProperty({ required: false })
     orderBy?: string
     
-    @ApiProperty({ required: false, default: SORT_DIRECTION.DESC })
+    @ApiProperty({ required: false, default: SORT_DIRECTION.DESC, enum: SORT_DIRECTION })
     direction?: SORT_DIRECTION
 }
 

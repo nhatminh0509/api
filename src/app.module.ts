@@ -11,11 +11,11 @@ import config from './common/config';
 
 @Module({
   imports: [
-    MongooseModule.forRoot(config.MONGO_URI),
-    UsersModule, 
     OrgsModule,
+    UsersModule, 
     FilesModule,
-    AuthModule
+    AuthModule,
+    MongooseModule.forRoot(config.MONGO_URI),
   ],
   controllers: [AppController],
   providers: [AppService],

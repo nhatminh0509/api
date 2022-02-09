@@ -7,3 +7,5 @@ export enum SORT_DIRECTION {
     ASC = 'asc',
     DESC = 'desc'
 }
+
+export const PERMISSION_KEY = 'permissions_key'

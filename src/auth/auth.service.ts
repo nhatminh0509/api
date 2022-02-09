@@ -8,25 +8,27 @@ import Permissions from './permissions';
 import { Role, RoleDocument } from './roles.model';
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
-import { User } from 'src/users/users.model';
 import config from 'src/common/config';
+import { OrgsService } from 'src/orgs/orgs.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(Role.name) private roleModel: SoftDeleteModel<RoleDocument>,
-
+    
     @Inject(forwardRef(() => UsersService))
     private readonly userService: UsersService,
+    
+    @Inject(forwardRef(() => OrgsService))
+    private readonly orgService: OrgsService
   ) {
     this.roleModel.createIndexes()
   }
 
-  async signIn(input: SignInInput) {
+  async signIn(domain, input: SignInInput) {
     const { userNameOrEmail, password } = input
 
-    const user = await this.userService.findOne(userNameOrEmail)
-
+    let user = await this.userService.findOne(userNameOrEmail)
 
     if (!user) {
       throw HTTP_STATUS.NOT_FOUND('User not found')
@@ -36,9 +38,28 @@ export class AuthService {
       throw HTTP_STATUS.NOT_FOUND('User name or password invalid')
     }
 
-    const token = await this.signAccountToken(user)
+    const org = await this.orgService.findOneByDomain('http://localhost:5500')
 
-    return { user, token }
+    let role = null
+    if (org && user.roles) {
+      role = user.roles[org._id]
+      delete user.roles
+      user.role = role
+    }
+
+    const userData = {
+      _id: user?._id,
+      status: user?.status,
+      phone: user?.phone,
+      email: user?.email,
+      avatar: user?.avatar,
+      username: user?.username,
+      role: role
+    }
+
+    const token = await this.signAccountToken(userData)
+
+    return { user: userData, token }
   }
 
   async signAccountToken(
@@ -54,8 +75,12 @@ export class AuthService {
     return token
   }
 
-
   async getPermissions () {
-      return Object.keys(Permissions)
+    return Object.keys(Permissions)
+  }
+
+  async userHasPermissions (id, domain, permissions) {
+    const res = await this.orgService.findOneByDomain(domain)
+    console.log(res)
   }
 }

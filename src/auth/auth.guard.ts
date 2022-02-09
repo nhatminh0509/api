@@ -20,6 +20,7 @@ export class AuthGuard implements CanActivate {
           /^Bearer\s/,
           '',
         )
+        this.logger.verbose(`d`)
         if (!token) {
           this.logger.verbose(`No token is provided`)
           return false
