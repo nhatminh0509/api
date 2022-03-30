@@ -18,6 +18,12 @@ const HTTP_STATUS = {
       statusCode: 200,
       message: message ? message : 'Success'
     }
+  },
+  FORBIDDEN: (message = null) => {
+    return new HttpException({
+      status: 403,
+      error: message ? message : 'Forbidden resource'
+    }, HttpStatus.FORBIDDEN)
   }
 }
 

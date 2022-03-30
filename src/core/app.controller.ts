@@ -1,19 +1,18 @@
 import { Controller, Get, Req } from '@nestjs/common'
-import { ApiBearerAuth, ApiHeader, ApiHeaders, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 import { AppService } from './app.service'
 import { CurrentOrgDomain, CurrentUser, UseAuthGuard } from './auth/auth.decorator'
-import Permissions from './auth/permissions'
+import Permissions from './permissions'
 import config from './common/config'
 
-@ApiTags('HOME')
+@ApiTags('Home')
 @Controller()
-@ApiBearerAuth('JWT') 
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @UseAuthGuard(Permissions.Hr_Access)
+  @UseAuthGuard(Permissions.CREATE_ROLE)
   getHello(@Req() request: Request, @CurrentOrgDomain() currentOrgDomain: string, @CurrentUser() user) {
     return {
       currentOrgDomain,

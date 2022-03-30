@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model, ObjectId } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
-import HTTP_STATUS from 'src/common/httpStatus';
-import { generateSlug } from 'src/common/function';
+import HTTP_STATUS from 'src/core/common/httpStatus';
+import { generateSlug } from 'src/core/common/function';
 import { Org, OrgDocument } from './orgs.model';
 import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './orgs.type';
 
@@ -64,6 +64,7 @@ export class OrgsService {
   }
   
   async findOneByDomain(domain: string) {
+    console.log(domain)
     const org = await this.orgModel.findOne({ domain })
     if (!org) throw HTTP_STATUS.NOT_FOUND('Domain not found')
     return org

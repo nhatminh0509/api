@@ -2,15 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isEmail } from 'class-validator';
 import { SoftDeleteModel } from 'mongoose-delete';
-import { checkObjectId } from 'src/common/function';
-import HTTP_STATUS from 'src/common/httpStatus';
+import { checkObjectId } from 'src/core/common/function';
+import HTTP_STATUS from 'src/core/common/httpStatus';
 import { User, UserDocument } from './users.model';
-import { CreateUserInput, UpdateUserInput } from './users.type';
+import { CreateUserInput, QueryListUser, UpdateUserInput } from './users.type';
 import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>) {}
+  constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>) {
+    this.userModel.createIndexes()
+  }
 
   async create(input: CreateUserInput) {
     const model = new this.userModel({
@@ -24,10 +26,30 @@ export class UsersService {
     return userCreated
   }
 
-  async findAll() {
+  async findAll(query: QueryListUser) {
+    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    let sort = {
+      [orderBy]: direction === 'asc' ? 1 : -1
+    }
+    let data = []
+    let total = 0
+    let condition = {}
+
+    if(searchText) { 
+      condition = {
+        ...condition,
+        $text: { $search: searchText }
+      }
+    }
+
+    data = await this.userModel.find(condition).sort(sort).skip(skip).limit(limit)
+    total = await this.userModel.countDocuments(condition)
+
     return {
-      data: await this.userModel.find(),
-      total: await this.userModel.countDocuments()
+      data,
+      total,
+      skip: Number(skip),
+      limit: Number(limit)
     }
   }
 

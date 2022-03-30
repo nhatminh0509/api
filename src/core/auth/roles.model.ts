@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import * as MongooseDelete from 'mongoose-delete'
-import Permissions from './permissions'
+import Permissions from '../permissions'
 
 export type RoleDocument = Role & MongooseDelete.SoftDeleteDocument
 

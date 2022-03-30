@@ -1,9 +1,10 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { PERMISSION_KEY } from "src/common/constants";
-import { Logger } from "src/common/Logger";
+import { PERMISSION_KEY } from "src/core/common/constants";
+import { Logger } from "src/core/common/Logger";
 import { AuthService } from "./auth.service";
-import Permissions from "./permissions";
+import Permissions from "../permissions";
+import HTTP_STATUS from "../common/httpStatus";
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
@@ -24,10 +25,12 @@ export class PermissionGuard implements CanActivate {
     const request = context.switchToHttp().getRequest()
     const user = request?.user
     const domain = request.headers.origin
-    console.log(domain, requiredPermission)
 
-    await this.authService.userHasPermissions(user._id, 'http://localhost:5500', requiredPermission)
-
-    return true
+    const permission = await this.authService.userHasPermissions(user._id, domain || 'http://localhost:5500', requiredPermission)
+  
+    if (permission) {
+      return permission
+    }
+    throw HTTP_STATUS.FORBIDDEN(`User not has permission: ${requiredPermission}`)
   }
 }

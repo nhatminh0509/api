@@ -1,9 +1,10 @@
 import { CanActivate, ExecutionContext, Inject, Injectable, Scope } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
-import config from "src/common/config";
-import { Logger } from "src/common/Logger";
+import config from "src/core/common/config";
+import { Logger } from "src/core/common/Logger";
 import { verify } from 'jsonwebtoken'
-import { UsersService } from "src/users/users.service";
+import { UsersService } from "src/modules/users/users.service";
+import HTTP_STATUS from "../common/httpStatus";
 
 @Injectable({ scope: Scope.REQUEST })
 export class AuthGuard implements CanActivate {
@@ -20,10 +21,9 @@ export class AuthGuard implements CanActivate {
           /^Bearer\s/,
           '',
         )
-        this.logger.verbose(`d`)
         if (!token) {
           this.logger.verbose(`No token is provided`)
-          return false
+          throw HTTP_STATUS.FORBIDDEN('Forbidden resource: No token is provided')
         }
 
         try {
@@ -33,11 +33,11 @@ export class AuthGuard implements CanActivate {
     
           request.userId = userId
     
-          if (!userId) return false
+          if (!userId) throw HTTP_STATUS.FORBIDDEN('Forbidden resource: User Id not found')
     
           const user = await this.userService.findOne(userId)
     
-          if (!user) return false
+          if (!user) throw HTTP_STATUS.FORBIDDEN('Forbidden resource: User not found')
     
           user.lastActivityAt = new Date()
           await user.save()

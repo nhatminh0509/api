@@ -1,8 +1,9 @@
 import { applyDecorators, createParamDecorator, ExecutionContext, SetMetadata, UseGuards } from '@nestjs/common';
-import { PERMISSION_KEY } from 'src/common/constants';
+import { PERMISSION_KEY } from 'src/core/common/constants';
 import { AuthGuard } from './auth.guard';
-import Permissions from './permissions';
+import Permissions from '../permissions';
 import { PermissionGuard } from './permissions.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 export const CurrentUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
@@ -21,5 +22,6 @@ export const CurrentOrgDomain = createParamDecorator(
 export const UseAuthGuard = (permissions?: Permissions) =>
   applyDecorators(
     SetMetadata(PERMISSION_KEY, permissions),
+    ApiBearerAuth(),
     UseGuards(AuthGuard, PermissionGuard),
   )

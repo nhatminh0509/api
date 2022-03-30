@@ -7,11 +7,12 @@ import {
   Delete,
   Put,
   Req,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UsersService } from './users.service';
-import { CreateUserInput, UpdateUserInput } from './users.type';
+import { CreateUserInput, QueryListUser, UpdateUserInput } from './users.type';
 
 @ApiTags('Users')
 @Controller('users')
@@ -24,8 +25,8 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: QueryListUser) {
+    return this.usersService.findAll(query);
   }
 
   @Get(':id')

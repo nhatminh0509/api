@@ -1,4 +1,4 @@
-import upload from "../common/upload"
+import upload from "../../core/common/upload"
 
 export class FilesService {
   async upload(file) {

@@ -11,10 +11,10 @@ export enum UserStatus {
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ required: true })
+  @Prop({ required: true, index: 'text' })
   displayName: string
   
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   username: string
   
   @Prop({ required: true })
@@ -23,10 +23,10 @@ export class User {
   @Prop({ required: false, default: '' })
   avatar: string
   
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   email: string
   
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   phone: string
 
   @Prop({ enum: UserStatus, type: String, default: UserStatus.Pending, index: true })

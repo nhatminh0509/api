@@ -2,10 +2,10 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { AppController } from './app.controller';
 import { AppMiddleware } from './app.middleware';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { OrgsModule } from './orgs/orgs.module';
+import { UsersModule } from '../modules/users/users.module';
+import { OrgsModule } from '../modules/orgs/orgs.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { FilesModule } from './files/files.module';
+import { FilesModule } from '../modules/files/files.module';
 import { AuthModule } from './auth/auth.module';
 import config from './common/config';
 

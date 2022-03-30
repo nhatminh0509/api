@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { SORT_DIRECTION } from "src/common/constants"
+import { SORT_DIRECTION } from "src/core/common/constants"
 
 export class QueryListOrg {
     @ApiProperty({ required: false })

@@ -1,6 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
-import { ORIGIN_ALLOWED } from 'src/common/constants'
+import { ORIGIN_ALLOWED } from 'src/core/common/constants'
 
 @Injectable()
 export class AppMiddleware implements NestMiddleware {
