@@ -25,4 +25,11 @@ export class FilesController {
     const { file } = body
     return this.filesService.upload(file)
   }
+
+  @Post('/v2')
+  // @UseAuthGuard(Permissions.FILE_UPLOAD)
+  create2(@Body() body: UploadInput) {
+    const { file } = body
+    return this.filesService.upload(file)
+  }
 }
