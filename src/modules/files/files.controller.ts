@@ -30,6 +30,6 @@ export class FilesController {
   // @UseAuthGuard(Permissions.FILE_UPLOAD)
   create2(@Body() body: UploadInput) {
     const { file } = body
-    return this.filesService.upload(file)
+    return this.filesService.upload2(file)
   }
 }
