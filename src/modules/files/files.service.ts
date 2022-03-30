@@ -4,6 +4,6 @@ export class FilesService {
   async upload(file) {
     const res = await upload(file)
     console.log(res)
-    return res
+    return { url: res.url }
   }
 }
