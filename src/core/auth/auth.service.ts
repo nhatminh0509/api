@@ -82,6 +82,34 @@ export class AuthService {
     return token
   }
 
+  async tokenTime (dateString: string): Promise<string> {
+    const date = new Date(dateString)
+    const authData = {
+      timestamp: date.getTime(),
+      date: dateString
+    }
+    const token = jwt.sign(authData, config.JWT_SECRET)
+    return token
+  }
+
+  async verifyToken (token: string) {
+    const tokenData = jwt.verify(token, config.JWT_SECRET)
+    const { timestamp } = tokenData as any
+    const now = Date.now()
+    if (timestamp && Number(timestamp) >= now) {
+      return {
+        ...tokenData as any,
+        now,
+        hasPermission: true
+      }
+    }
+    return {
+      ...tokenData as any,
+      now,
+      hasPermission: false
+    }
+  }
+
   async userHasPermissions (id, domain, permissions) {
     const user = await this.userService.findOne(id)
     const org = await this.orgService.findOneByDomain(domain)

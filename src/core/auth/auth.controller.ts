@@ -29,6 +29,18 @@ export class AuthController {
   findAllPermissions() {
     return this.authService.getPermissions()
   }
+  
+  @Get('/get-token-time/:dateString')
+  // @UseAuthGuard(Permissions.LIST_PERMISSIONS)
+  getTokenTime(@Param('dateString') dateString: string) {
+    return this.authService.tokenTime(dateString)
+  }
+
+  @Get('/verify/:token')
+  // @UseAuthGuard(Permissions.LIST_PERMISSIONS)
+  getVerifyToken(@Param('token') token: string) {
+    return this.authService.verifyToken(token)
+  }
 
   @Post('/create-roles')
   @UseAuthGuard(Permissions.CREATE_ROLE)
