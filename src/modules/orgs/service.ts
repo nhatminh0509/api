@@ -4,8 +4,8 @@ import { isValidObjectId, Model, ObjectId } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import HTTP_STATUS from 'src/core/common/httpStatus';
 import { generateSlug } from 'src/core/common/function';
-import { Org, OrgDocument } from './orgs.model';
-import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './orgs.type';
+import { Org, OrgDocument } from './model';
+import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './type';
 
 @Injectable()
 export class OrgsService {

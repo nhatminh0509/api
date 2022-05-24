@@ -2,17 +2,17 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import HTTP_STATUS from 'src/core/common/httpStatus';
-import { UsersService } from 'src/modules/users/users.service';
+import { UsersService } from 'src/modules/users/service';
 import { CreateRoleInput, QueryListRole, SignInInput, UpdateRoleInput } from './auth.type';
 import Permissions from '../permissions';
 import { Role, RoleDocument } from './roles.model';
 import * as bcrypt from 'bcrypt'
 import * as jwt from 'jsonwebtoken'
 import config from 'src/core/common/config';
-import { OrgsService } from 'src/modules/orgs/orgs.service';
+import { OrgsService } from 'src/modules/orgs/service';
 import { checkObjectId } from '../common/function';
 import { retry } from 'rxjs';
-import { UserStatus } from 'src/modules/users/users.model';
+import { UserStatus } from 'src/modules/users/model';
 
 @Injectable()
 export class AuthService {

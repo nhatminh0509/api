@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { OrgsService } from './orgs.service';
-import { OrgsController } from './orgs.controller';
+import { OrgsService } from './service';
+import { OrgsController } from './controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Org, OrgSchema } from './orgs.model';
+import { Org, OrgSchema } from './model';
 
 @Module({
   controllers: [OrgsController],

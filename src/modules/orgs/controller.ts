@@ -13,8 +13,8 @@ import { ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { UseAuthGuard } from 'src/core/auth/auth.decorator';
 import Permissions from 'src/core/permissions';
-import { OrgsService } from './orgs.service';
-import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './orgs.type';
+import { OrgsService } from './service';
+import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './type';
 
 @ApiTags('Orgs')
 @Controller('orgs')

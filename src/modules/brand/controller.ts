@@ -9,12 +9,11 @@ import {
   Req,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
+import { ApiTags } from '@nestjs/swagger';
 import { UseAuthGuard } from 'src/core/auth/auth.decorator';
 import Permissions from 'src/core/permissions';
-import { UsersService } from './users.service';
-import { CreateUserInput, QueryListUser, UpdateUserInput } from './users.type';
+import { UsersService } from './service';
+import { CreateUserInput, QueryListUser, UpdateUserInput } from './type';
 
 @ApiTags('Users')
 @Controller('users')

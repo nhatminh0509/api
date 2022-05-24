@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { SORT_DIRECTION } from "src/core/common/constants"
-import { User, UserStatus } from "./users.model"
+import { User, UserStatus } from "./model"
 
 export class QueryListUser {
     @ApiProperty({ required: false })

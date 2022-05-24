@@ -6,7 +6,7 @@ import {
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
 import { UseAuthGuard } from 'src/core/auth/auth.decorator';
 import Permissions from 'src/core/permissions';
-import { FilesService } from './files.service';
+import { FilesService } from './service';
 
 
 class UploadInput {

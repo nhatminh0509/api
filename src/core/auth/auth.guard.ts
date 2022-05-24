@@ -3,7 +3,7 @@ import { REQUEST } from "@nestjs/core";
 import config from "src/core/common/config";
 import { Logger } from "src/core/common/Logger";
 import { verify } from 'jsonwebtoken'
-import { UsersService } from "src/modules/users/users.service";
+import { UsersService } from "src/modules/users/service";
 import HTTP_STATUS from "../common/httpStatus";
 
 @Injectable({ scope: Scope.REQUEST })

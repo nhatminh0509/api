@@ -4,8 +4,8 @@ import { isEmail } from 'class-validator';
 import { SoftDeleteModel } from 'mongoose-delete';
 import { checkObjectId } from 'src/core/common/function';
 import HTTP_STATUS from 'src/core/common/httpStatus';
-import { User, UserDocument } from './users.model';
-import { CreateUserInput, QueryListUser, UpdateUserInput } from './users.type';
+import { User, UserDocument } from './model';
+import { CreateUserInput, QueryListUser, UpdateUserInput } from './type';
 import * as bcrypt from 'bcrypt'
 
 @Injectable()

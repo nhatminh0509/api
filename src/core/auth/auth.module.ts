@@ -1,7 +1,7 @@
 import { forwardRef, Global, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { OrgsModule } from 'src/modules/orgs/orgs.module';
-import { UsersModule } from 'src/modules/users/users.module';
+import { OrgsModule } from 'src/modules/orgs/module';
+import { UsersModule } from 'src/modules/users/module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { Role, RoleSchema } from './roles.model';
