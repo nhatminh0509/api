@@ -12,7 +12,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @UseAuthGuard(Permissions.CREATE_ROLE)
+  @UseAuthGuard()
   getHello(@Req() request: Request, @CurrentOrgDomain() currentOrgDomain: string, @CurrentUser() user) {
     return {
       currentOrgDomain,

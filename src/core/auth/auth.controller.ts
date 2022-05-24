@@ -29,18 +29,6 @@ export class AuthController {
   findAllPermissions() {
     return this.authService.getPermissions()
   }
-  
-  @Get('/get-token-time/:dateString')
-  // @UseAuthGuard(Permissions.LIST_PERMISSIONS)
-  getTokenTime(@Param('dateString') dateString: string) {
-    return this.authService.tokenTime(dateString)
-  }
-
-  @Get('/verify/:token')
-  // @UseAuthGuard(Permissions.LIST_PERMISSIONS)
-  getVerifyToken(@Param('token') token: string) {
-    return this.authService.verifyToken(token)
-  }
 
   @Post('/create-roles')
   @UseAuthGuard(Permissions.CREATE_ROLE)
@@ -49,11 +37,13 @@ export class AuthController {
   }
 
   @Get('/roles')
+  @UseAuthGuard(Permissions.READ_ROLE)
   findAllRole(@Query() query: QueryListRole) {
     return this.authService.findAllRole(query)
   }
-
+  
   @Get('/roles/:id')
+  @UseAuthGuard(Permissions.READ_ROLE)
   findOneRole(@Param('id') id: string) {
     return this.authService.findOneRole(id)
   }
@@ -65,7 +55,7 @@ export class AuthController {
   }
 
   @Delete('/roles/:id')
-  @UseAuthGuard(Permissions.UPDATE_ROLE)
+  @UseAuthGuard(Permissions.DELETE_ROLE)
   remove(@Param('id') id: string) {
     return this.authService.removeRole(id)
   }

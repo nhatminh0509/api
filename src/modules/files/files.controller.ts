@@ -20,16 +20,9 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post()
-  // @UseAuthGuard(Permissions.FILE_UPLOAD)
+  @UseAuthGuard(Permissions.FILE_UPLOAD)
   create(@Body() body: UploadInput) {
     const { file } = body
     return this.filesService.upload(file)
-  }
-
-  @Post('/v2')
-  // @UseAuthGuard(Permissions.FILE_UPLOAD)
-  create2(@Body() body: UploadInput) {
-    const { file } = body
-    return this.filesService.upload2(file)
   }
 }

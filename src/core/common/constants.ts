@@ -3,6 +3,8 @@ export const ORIGIN_ALLOWED = [
     'http://127.0.0.1:5500',
 ]
 
+export const ALL_ORG = 'ALL_ORG'
+
 export enum SORT_DIRECTION {
     ASC = 'asc',
     DESC = 'desc'
