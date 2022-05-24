@@ -12,40 +12,39 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { UseAuthGuard } from 'src/core/auth/auth.decorator';
 import Permissions from 'src/core/permissions';
-import { UsersService } from './service';
-import { CreateUserInput, QueryListUser, UpdateUserInput } from './type';
+import { BrandsService } from './service';
+import { CreateBrandInput, QueryListBrand, UpdateBrandInput } from './type';
 
-@ApiTags('Users')
-@Controller('users')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+@ApiTags('Brand')
+@Controller('brands')
+export class BrandsController {
+  constructor(private readonly BrandsService: BrandsService) {}
 
   @Post()
-  @UseAuthGuard(Permissions.CREATE_USER)
-  create(@Body() body: CreateUserInput) {
-    return this.usersService.create(body);
+  @UseAuthGuard(Permissions.CREATE_BRAND)
+  create(@Body() body: CreateBrandInput) {
+    return this.BrandsService.create(body);
   }
   
   @Get()
-  @UseAuthGuard(Permissions.READ_USER)
-  findAll(@Query() query: QueryListUser) {
-    return this.usersService.findAll(query);
+  findAll(@Query() query: QueryListBrand) {
+    return this.BrandsService.findAll(query);
   }
   
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+  @Get(':field')
+  findOne(@Param('field') field: string) {
+    return this.BrandsService.findOne(field);
   }
   
-  @Put(':id')
-  @UseAuthGuard(Permissions.UPDATE_USER)
-  update(@Param('id') slugOrId: string, @Body() updateInput: UpdateUserInput) {
-    return this.usersService.update(slugOrId, updateInput)
+  @Put(':field')
+  @UseAuthGuard(Permissions.UPDATE_BRAND)
+  update(@Param('field') slugOrId: string, @Body() updateInput: UpdateBrandInput) {
+    return this.BrandsService.update(slugOrId, updateInput)
   }
   
-  @Delete(':id')
-  @UseAuthGuard(Permissions.DELETE_USER)
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  @Delete(':field')
+  @UseAuthGuard(Permissions.DELETE_BRAND)
+  remove(@Param('field') id: string) {
+    return this.BrandsService.remove(id);
   }
 }

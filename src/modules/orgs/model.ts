@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { mongoose } from '@typegoose/typegoose'
 import * as MongooseDelete from 'mongoose-delete'
+import { User } from '../users/model'
 
 export type OrgDocument = Org & MongooseDelete.SoftDeleteDocument
 
@@ -11,7 +13,7 @@ export class Org {
   @Prop({ required: true, unique: true })
   domain: string
   
-  @Prop({ required: true })
+  @Prop({ required: true, type: mongoose.Types.ObjectId, ref: User.name })
   owner: string
 
   @Prop({ required: true, unique: true })

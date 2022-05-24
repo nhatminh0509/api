@@ -22,7 +22,7 @@ export class OrgsController {
   constructor(private readonly orgsService: OrgsService) {}
 
   @Post()
-  @UseAuthGuard(Permissions.CREATE_ORG)
+  // @UseAuthGuard(Permissions.CREATE_ORG)
   create(@Body() body: CreateOrgInput) {
     return this.orgsService.create(body);
   }

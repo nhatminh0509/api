@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppMiddleware } from './app.middleware';
 import { AppService } from './app.service';
 import { UsersModule } from '../modules/users/module';
+import { BrandsModule } from 'src/modules/brand/module';
 import { OrgsModule } from '../modules/orgs/module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FilesModule } from '../modules/files/module';
@@ -13,6 +14,7 @@ import config from './common/config';
   imports: [
     OrgsModule,
     UsersModule, 
+    BrandsModule,
     FilesModule,
     AuthModule,
     MongooseModule.forRoot(config.MONGO_URI),

@@ -1,11 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { isValidObjectId, Model, ObjectId } from 'mongoose';
+import { isValidObjectId } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import HTTP_STATUS from 'src/core/common/httpStatus';
 import { generateSlug } from 'src/core/common/function';
 import { Org, OrgDocument } from './model';
 import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './type';
+import { mongoose } from '@typegoose/typegoose';
 
 @Injectable()
 export class OrgsService {
@@ -73,9 +74,9 @@ export class OrgsService {
   async findOne(slugOrId: string) {
     let org = null
     if (isValidObjectId(slugOrId)){
-      org = await this.orgModel.findById(slugOrId)
+      org = await this.orgModel.findById(slugOrId).populate('owner').lean()
     } else {
-      org = await this.orgModel.findOne({ slug: slugOrId })
+      org = await this.orgModel.findOne({ slug: slugOrId }).populate('owner').lean()
     }
     if (!org) throw HTTP_STATUS.NOT_FOUND('Org not found')
     return org

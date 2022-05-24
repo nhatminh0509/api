@@ -1,32 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { isEmail } from 'class-validator';
 import { SoftDeleteModel } from 'mongoose-delete';
-import { checkObjectId } from 'src/core/common/function';
+import { checkObjectId, generateSlug } from 'src/core/common/function';
 import HTTP_STATUS from 'src/core/common/httpStatus';
-import { User, UserDocument } from './model';
-import { CreateUserInput, QueryListUser, UpdateUserInput } from './type';
-import * as bcrypt from 'bcrypt'
+import { Brand, BrandDocument } from './model';
+import { CreateBrandInput, QueryListBrand, UpdateBrandInput } from './type';
 
 @Injectable()
-export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>) {
-    this.userModel.createIndexes()
+export class BrandsService {
+  constructor(@InjectModel(Brand.name) private brandModel: SoftDeleteModel<BrandDocument>) {
+    this.brandModel.createIndexes()
   }
 
-  async create(input: CreateUserInput) {
-    const model = new this.userModel({
+  async create(input: CreateBrandInput) {
+    const model = new this.brandModel({
       ...input,
-      password: bcrypt.hashSync(
-        input.password || '@admin',
-        10,
-      ),
+      slug: generateSlug(input.name)
     })
-    const userCreated = await model.save()
-    return userCreated
+    const modelCreated = await model.save()
+    return modelCreated
   }
 
-  async findAll(query: QueryListUser) {
+  async findAll(query: QueryListBrand) {
     const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
@@ -42,8 +37,8 @@ export class UsersService {
       }
     }
 
-    data = await this.userModel.find(condition).sort(sort).skip(skip).limit(limit)
-    total = await this.userModel.countDocuments(condition)
+    data = await this.brandModel.find(condition).sort(sort).skip(skip).limit(limit)
+    total = await this.brandModel.countDocuments(condition)
 
     return {
       data,
@@ -56,46 +51,39 @@ export class UsersService {
   async findOne(field: string) {
     let model = null
     if (checkObjectId(field)){
-      model = await this.userModel.findById(field)
-    } else if (isEmail(field)) {
-      model = await this.userModel.findOne({ email: field })
+      model = await this.brandModel.findById(field)
     } else {
-      model = await this.userModel.findOne({ username: field })
+      model = await this.brandModel.findOne({ slug: field })
     }
-    if (!model) throw HTTP_STATUS.NOT_FOUND('User not found')
+    if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
     return model
   }
 
 
-  async update(field: string, input: UpdateUserInput) {
-    let user = null
-    let updateInput = { ...input }
-    if (input.password) {
-      updateInput.password = bcrypt.hashSync(
-        input.password || '@admin',
-        10,
-      )
+  async update(field: string, input: UpdateBrandInput) {
+    let model = null
+    let updateInput = { ...input } as any
+    if (updateInput.name) {
+      updateInput.slug = generateSlug(updateInput.name)
     }
     if (checkObjectId(field)){
-      user = await this.userModel.findByIdAndUpdate(field, updateInput)
-    } else if (isEmail(field)) {
-      user = await this.userModel.findOneAndUpdate({ email: field }, updateInput)
+      model = await this.brandModel.findByIdAndUpdate(field, updateInput)
     } else {
-      user = await this.userModel.findOneAndUpdate({ username: field }, updateInput)
+      model = await this.brandModel.findOneAndUpdate({ slug: field }, updateInput)
     }
-    if (!user) throw HTTP_STATUS.NOT_FOUND('User not found')
-    const updated = await this.findOne(user._id)
+    if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
+    const updated = await this.findOne(model._id)
     return updated
   }
 
   async remove(slugOrId: string) {
     let res = null
     if (checkObjectId(slugOrId)){
-      res = await this.userModel.delete({
+      res = await this.brandModel.delete({
         id: slugOrId
       })
     } else {
-      res = await this.userModel.delete({
+      res = await this.brandModel.delete({
         slug: slugOrId
       })
     }

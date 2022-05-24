@@ -1,43 +1,25 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import * as MongooseDelete from 'mongoose-delete'
 
-export type UserDocument = User & MongooseDelete.SoftDeleteDocument
-
-export enum UserStatus {
-  Pending = 'Pending',
-  Active = 'Active',
-  Deactivated = 'Deactivated',
-}
+export type BrandDocument = Brand & MongooseDelete.SoftDeleteDocument
 
 @Schema({ timestamps: true })
-export class User {
-  @Prop({ required: true, index: 'text' })
-  displayName: string
-  
+export class Brand {
   @Prop({ required: true, unique: true })
-  username: string
-  
+  slug: string
+
   @Prop({ required: true })
-  password: string
+  name: string
 
+  @Prop({ required: true })
+  image: string
+  
   @Prop({ required: false, default: '' })
-  avatar: string
-  
-  @Prop({ required: true, unique: true })
-  email: string
-  
-  @Prop({ required: true, unique: true })
-  phone: string
-
-  @Prop({ enum: UserStatus, type: String, default: UserStatus.Pending, index: true })
-  status: UserStatus
+  description?: string
 
   @Prop({ type: Object, default: {} })
-  roles: object
-
-  @Prop({ required: false, type: Date, default: null })
-  lastActivityAt: Date | null
+  others?: object
 }
 
-export const UserSchema = SchemaFactory.createForClass(User)
-UserSchema.plugin(MongooseDelete, { overrideMethods: 'all' })
+export const BrandSchema = SchemaFactory.createForClass(Brand).index({ name: 'text', description: 'text' })
+BrandSchema.plugin(MongooseDelete, { overrideMethods: 'all' })

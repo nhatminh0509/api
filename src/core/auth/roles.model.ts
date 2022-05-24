@@ -1,7 +1,9 @@
+import { mongoose } from '@typegoose/typegoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import * as MongooseDelete from 'mongoose-delete'
 import { ALL_ORG } from '../common/constants'
 import Permissions from '../permissions'
+import { Org } from 'src/modules/orgs/model';
 
 export type RoleDocument = Role & MongooseDelete.SoftDeleteDocument
 
@@ -16,7 +18,7 @@ export class Role {
   @Prop({ required: false, default: 0 })
   priority: number
 
-  @Prop({ required: false,  type: String, default: ALL_ORG })
+  @Prop({ required: false,  type: mongoose.Types.ObjectId, ref: Org.name })
   orgId: string
 }
 

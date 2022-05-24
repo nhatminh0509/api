@@ -11,7 +11,6 @@ import * as jwt from 'jsonwebtoken'
 import config from 'src/core/common/config';
 import { OrgsService } from 'src/modules/orgs/service';
 import { checkObjectId } from '../common/function';
-import { retry } from 'rxjs';
 import { UserStatus } from 'src/modules/users/model';
 
 @Injectable()
@@ -49,11 +48,11 @@ export class AuthService {
 
     let role = null
     if (org && user.roles) {
-      role = user.roles[org._id]
+      role = await this.roleModel.findById(user.roles[org._id]).lean()
       delete user.roles
-      user.role = role
+      user.permissions = role?.permissions || []
     }
-
+    
     const userData = {
       _id: user?._id,
       status: user?.status,
@@ -61,7 +60,7 @@ export class AuthService {
       email: user?.email,
       avatar: user?.avatar,
       username: user?.username,
-      role: role
+      permissions: user?.permissions 
     }
 
     const token = await this.signAccountToken(userData)
@@ -139,7 +138,7 @@ export class AuthService {
   async findOneRole(field: string) {
     let model = null
     if (checkObjectId(field)){
-      model = await this.roleModel.findById(field)
+      model = await (await this.roleModel.findById(field)).populate('orgId')
     }
     if (!model) throw HTTP_STATUS.NOT_FOUND('Role not found')
     return model

@@ -1,8 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { SORT_DIRECTION } from "src/core/common/constants"
-import { User, UserStatus } from "./model"
-
-export class QueryListUser {
+export class QueryListBrand {
     @ApiProperty({ required: false })
     searchText?: string
     
@@ -19,54 +17,30 @@ export class QueryListUser {
     direction?: SORT_DIRECTION
 }
 
-export class CreateUserInput {
+export class CreateBrandInput {
     @ApiProperty({ required: true })
-    displayName: string
+    name: string
     
     @ApiProperty({ required: true })
-    username: string
-
-    @ApiProperty({ required: true })
-    password: string
+    image: string
     
     @ApiProperty({ required: false })
-    avatar?: string
-    
-    @ApiProperty({ required: true })
-    email: string
-    
-    @ApiProperty({ required: true })
-    phone: string
+    description?: string
 
     @ApiProperty({ required: false })
-    roles?: object
-    
-    @ApiProperty({ required: true, enum: UserStatus })
-    status: UserStatus
+    others?: object
 }
 
-export class UpdateUserInput {
+export class UpdateBrandInput {
     @ApiProperty({ required: false })
-    displayName?: string
+    name?: string
     
     @ApiProperty({ required: false })
-    username?: string
+    image?: string
+    
+    @ApiProperty({ required: false })
+    description?: string
 
     @ApiProperty({ required: false })
-    password?: string
-    
-    @ApiProperty({ required: false })
-    avatar?: string
-    
-    @ApiProperty({ required: false })
-    email?: string
-    
-    @ApiProperty({ required: false })
-    phone?: string
-
-    @ApiProperty({ required: false })
-    roles?: object
-    
-    @ApiProperty({ required: false, enum: UserStatus })
-    status?: UserStatus
+    others?: object
 }
