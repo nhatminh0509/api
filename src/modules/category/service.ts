@@ -22,6 +22,7 @@ export class CategoryService {
       image: input.image,
       description: input.description,
       others: input.others,
+      orgId: input.orgId,
       slug: generateSlug(input.name)
     })
     const modelCreated = await model.save()
