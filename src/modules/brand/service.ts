@@ -23,6 +23,7 @@ export class BrandsService {
       description: input.description,
       others: input.others,
       orgId: input.orgId,
+      shortName: input.shortName,
       slug: generateSlug(input.name)
     })
     const modelCreated = await model.save()

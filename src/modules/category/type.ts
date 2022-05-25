@@ -21,14 +21,17 @@ export class CreateCategoryInput {
     @ApiProperty({ required: true })
     name: string
     
+    @ApiProperty({ required: false })
+    shortName?: string
+
     @ApiProperty({ required: true })
     image: string
     
     @ApiProperty({ required: false })
     description?: string
     
-    @ApiProperty({ required: false })
-    orgId?: string
+    @ApiProperty({ required: true })
+    orgId: string
 
     @ApiProperty({ required: false })
     brandIds?: string[]
@@ -40,6 +43,9 @@ export class CreateCategoryInput {
 export class UpdateCategoryInput {
     @ApiProperty({ required: false })
     name?: string
+    
+    @ApiProperty({ required: false })
+    shortName?: string
     
     @ApiProperty({ required: false })
     image?: string

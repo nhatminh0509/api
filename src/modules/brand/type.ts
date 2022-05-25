@@ -22,13 +22,16 @@ export class CreateBrandInput {
     name: string
     
     @ApiProperty({ required: true })
+    shortName: string
+    
+    @ApiProperty({ required: true })
     image: string
     
     @ApiProperty({ required: false })
     description?: string
 
-    @ApiProperty({ required: false })
-    orgId?: string
+    @ApiProperty({ required: true })
+    orgId: string
 
     @ApiProperty({ required: false })
     categoryIds?: string[]
@@ -40,6 +43,9 @@ export class CreateBrandInput {
 export class UpdateBrandInput {
     @ApiProperty({ required: false })
     name?: string
+    
+    @ApiProperty({ required: false })
+    shortName?: string
     
     @ApiProperty({ required: false })
     image?: string

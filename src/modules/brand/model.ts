@@ -12,6 +12,9 @@ export class Brand {
 
   @Prop({ required: true })
   name: string
+  
+  @Prop({ required: true })
+  shortName: string
 
   @Prop({ required: true })
   image: string
@@ -19,12 +22,12 @@ export class Brand {
   @Prop({ required: false, default: '' })
   description?: string
 
-  @Prop({ required: false,  type: Types.ObjectId, ref: Org.name })
+  @Prop({ required: true,  type: Types.ObjectId, ref: Org.name })
   orgId: string
 
   @Prop({ type: Object, default: {} })
   others?: object
 }
 
-export const BrandSchema = SchemaFactory.createForClass(Brand).index({ name: 'text', description: 'text' })
+export const BrandSchema = SchemaFactory.createForClass(Brand).index({ name: 'text', description: 'text', shortName: 'text' })
 BrandSchema.plugin(MongooseDelete, { overrideMethods: 'all' })

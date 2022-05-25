@@ -20,7 +20,7 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  @UseAuthGuard(Permissions.CREATE_BRAND)
+  @UseAuthGuard(Permissions.CREATE_CATEGORY)
   create(@Body() body: CreateCategoryInput) {
     return this.categoryService.create(body);
   }
@@ -36,13 +36,13 @@ export class CategoryController {
   }
   
   @Put(':field')
-  @UseAuthGuard(Permissions.UPDATE_BRAND)
+  @UseAuthGuard(Permissions.UPDATE_CATEGORY)
   update(@Param('field') slugOrId: string, @Body() updateInput: UpdateCategoryInput) {
     return this.categoryService.update(slugOrId, updateInput)
   }
   
   @Delete(':field')
-  @UseAuthGuard(Permissions.DELETE_BRAND)
+  @UseAuthGuard(Permissions.DELETE_CATEGORY)
   remove(@Param('field') id: string) {
     return this.categoryService.remove(id);
   }

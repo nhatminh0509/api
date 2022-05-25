@@ -23,6 +23,10 @@ enum Permissions  {
     CREATE_BRAND = 'Create_Brand',
     UPDATE_BRAND = 'Update_Brand',
     DELETE_BRAND = 'Delete_Brand',
+
+    CREATE_CATEGORY = 'Create_Category',
+    UPDATE_CATEGORY = 'Update_Category',
+    DELETE_CATEGORY = 'Delete_Category',
 }
 
 export default Permissions

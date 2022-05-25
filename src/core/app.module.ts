@@ -10,6 +10,7 @@ import { OrgsModule } from 'src/modules/orgs/module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { FilesModule } from 'src/modules/files/module';
 import { AuthModule } from './auth/auth.module';
+import { KeywordModule } from 'src/modules/keyword/module';
 import config from './common/config';
 
 @Module({
@@ -19,6 +20,7 @@ import config from './common/config';
     BrandsModule,
     CategoryModule,
     RelationshipCategoryBrandModule,
+    KeywordModule,
     FilesModule,
     AuthModule,
     MongooseModule.forRoot(config.MONGO_URI),

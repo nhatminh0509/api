@@ -14,17 +14,20 @@ export class Category {
   name: string
 
   @Prop({ required: true })
+  shortName: string
+
+  @Prop({ required: true })
   image: string
   
   @Prop({ required: false, default: '' })
   description?: string
 
-  @Prop({ required: false,  type: Types.ObjectId, ref: Org.name })
+  @Prop({ required: true,  type: Types.ObjectId, ref: Org.name })
   orgId: string
 
   @Prop({ type: Object, default: {} })
   others?: object
 }
 
-export const CategorySchema = SchemaFactory.createForClass(Category).index({ name: 'text', description: 'text' })
+export const CategorySchema = SchemaFactory.createForClass(Category).index({ name: 'text', description: 'text', shortName: 'text' })
 CategorySchema.plugin(MongooseDelete, { overrideMethods: 'all' })
