@@ -138,7 +138,10 @@ export class AuthService {
   async findOneRole(field: string) {
     let model = null
     if (checkObjectId(field)){
-      model = await (await this.roleModel.findById(field)).populate('orgId')
+      model = await (await this.roleModel.findById(field)).populate({
+        path: 'orgId',
+        match: { _id: { $ne: null }}
+      })
     }
     if (!model) throw HTTP_STATUS.NOT_FOUND('Role not found')
     return model

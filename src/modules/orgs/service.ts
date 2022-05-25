@@ -66,7 +66,10 @@ export class OrgsService {
   
   async findOneByDomain(domain: string) {
     console.log(domain)
-    const org = await this.orgModel.findOne({ domain })
+    const org = await this.orgModel.findOne({ domain }).populate({
+      path: 'owner',
+      match: { _id: { $ne: null }}
+    }).lean()
     if (!org) throw HTTP_STATUS.NOT_FOUND('Domain not found')
     return org
   }
@@ -74,9 +77,15 @@ export class OrgsService {
   async findOne(slugOrId: string) {
     let org = null
     if (isValidObjectId(slugOrId)){
-      org = await this.orgModel.findById(slugOrId).populate('owner').lean()
+      org = await this.orgModel.findById(slugOrId).populate({
+        path: 'owner',
+        match: { _id: { $ne: null }}
+      }).lean()
     } else {
-      org = await this.orgModel.findOne({ slug: slugOrId }).populate('owner').lean()
+      org = await this.orgModel.findOne({ slug: slugOrId }).populate({
+        path: 'owner',
+        match: { _id: { $ne: null }}
+      }).lean()
     }
     if (!org) throw HTTP_STATUS.NOT_FOUND('Org not found')
     return org
