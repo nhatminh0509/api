@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger"
 import { SORT_DIRECTION } from "src/core/common/constants"
-export class QueryListBrand {
+export class QueryListCategory {
     @ApiProperty({ required: false })
     searchText?: string
     
@@ -17,7 +17,7 @@ export class QueryListBrand {
     direction?: SORT_DIRECTION
 }
 
-export class CreateBrandInput {
+export class CreateCategoryInput {
     @ApiProperty({ required: true })
     name: string
     
@@ -26,15 +26,15 @@ export class CreateBrandInput {
     
     @ApiProperty({ required: false })
     description?: string
-
+    
     @ApiProperty({ required: false })
-    categoryIds?: string[]
+    brandIds?: string[]
 
     @ApiProperty({ required: false })
     others?: object
 }
 
-export class UpdateBrandInput {
+export class UpdateCategoryInput {
     @ApiProperty({ required: false })
     name?: string
     
@@ -45,7 +45,7 @@ export class UpdateBrandInput {
     description?: string
 
     @ApiProperty({ required: false })
-    categoryIds?: string[]
+    brandIds?: string[]
 
     @ApiProperty({ required: false })
     others?: object

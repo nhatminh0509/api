@@ -2,11 +2,13 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { AppController } from './app.controller';
 import { AppMiddleware } from './app.middleware';
 import { AppService } from './app.service';
-import { UsersModule } from '../modules/users/module';
+import { UsersModule } from 'src/modules/users/module';
 import { BrandsModule } from 'src/modules/brand/module';
-import { OrgsModule } from '../modules/orgs/module';
+import { CategoryModule } from 'src/modules/category/module';
+import { RelationshipCategoryBrandModule } from 'src/modules/relationship-category-brand/module';
+import { OrgsModule } from 'src/modules/orgs/module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { FilesModule } from '../modules/files/module';
+import { FilesModule } from 'src/modules/files/module';
 import { AuthModule } from './auth/auth.module';
 import config from './common/config';
 
@@ -15,6 +17,8 @@ import config from './common/config';
     OrgsModule,
     UsersModule, 
     BrandsModule,
+    CategoryModule,
+    RelationshipCategoryBrandModule,
     FilesModule,
     AuthModule,
     MongooseModule.forRoot(config.MONGO_URI),

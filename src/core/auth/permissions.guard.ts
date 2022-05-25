@@ -25,8 +25,8 @@ export class PermissionGuard implements CanActivate {
     const request = context.switchToHttp().getRequest()
     const user = request?.user
     const domain = request.headers.origin
-
-    const permission = await this.authService.userHasPermissions(user._id, domain || 'http://localhost:5500', requiredPermission)
+    // TODO
+    const permission = await this.authService.userHasPermissions(user._id, 'http://localhost:5500', requiredPermission)
   
     if (permission) {
       return permission

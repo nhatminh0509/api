@@ -43,7 +43,7 @@ export class AuthService {
     if (user.status !== UserStatus.Active) {
       throw HTTP_STATUS.FORBIDDEN('User not active')
     }
-
+    // TODO
     const org = await this.orgService.findOneByDomain('http://localhost:5500')
 
     let role = null
