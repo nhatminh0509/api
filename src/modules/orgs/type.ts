@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
+import { IsNotEmpty } from "class-validator"
 import { SORT_DIRECTION } from "src/core/common/constants"
 
 export class QueryListOrg {
@@ -25,12 +26,15 @@ export class QueryListOrg {
 }
 
 export class CreateOrgInput {
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     name: string
     
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     domain: string
-
+    
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     owner: string
     

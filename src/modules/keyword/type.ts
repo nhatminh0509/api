@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
+import { IsNotEmpty } from "class-validator"
 import { SORT_DIRECTION } from "src/core/common/constants"
 export class QueryListKeyword {
     @ApiProperty({ required: false })
@@ -24,6 +25,7 @@ export class NewKeyword {
     @ApiProperty({ required: true })
     orgId: string
     
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     keys: string[]
 }

@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import { checkObjectId, generateSlug } from 'src/core/common/function';
 import HTTP_STATUS from 'src/core/common/httpStatus';
@@ -22,14 +23,14 @@ export class BrandsService {
       image: input.image,
       description: input.description,
       others: input.others,
-      orgId: input.orgId,
+      orgId: new Types.ObjectId(input.orgId),
       shortName: input.shortName,
       slug: generateSlug(input.name)
     })
     const modelCreated = await model.save()
     if (modelCreated) {
       await this.relationshipCategoryBrandService.updateBrand({
-        brandId: modelCreated._id?.toString(),
+        brandId: modelCreated._id,
         categoryIds: input.categoryIds
       })
     }
@@ -91,7 +92,7 @@ export class BrandsService {
     if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
     if (categoryIds) {
       await this.relationshipCategoryBrandService.updateBrand({
-        brandId: model._id?.toString(),
+        brandId: model._id,
         categoryIds
       })
     }

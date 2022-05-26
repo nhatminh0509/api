@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UseAuthGuard } from 'src/core/auth/auth.decorator';
+import { CurrentOrg, UseAuthGuard } from 'src/core/auth/auth.decorator';
 import Permissions from 'src/core/permissions';
 import { CategoryService } from './service';
 import { CreateCategoryInput, QueryListCategory, UpdateCategoryInput } from './type';
@@ -21,8 +21,8 @@ export class CategoryController {
 
   @Post()
   @UseAuthGuard(Permissions.CREATE_CATEGORY)
-  create(@Body() body: CreateCategoryInput) {
-    return this.categoryService.create(body);
+  create(@CurrentOrg() org, @Body() body: CreateCategoryInput) {
+    return this.categoryService.create({ ...body, orgId: org?._id });
   }
   
   @Get()

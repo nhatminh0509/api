@@ -1,5 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import { checkObjectId, generateSlug } from 'src/core/common/function';
 import HTTP_STATUS from 'src/core/common/httpStatus';
@@ -22,7 +23,7 @@ export class CategoryService {
       image: input.image,
       description: input.description,
       others: input.others,
-      orgId: input.orgId,
+      orgId: new Types.ObjectId(input.orgId),
       shortName: input.shortName,
       slug: generateSlug(input.name)
     })
@@ -66,7 +67,8 @@ export class CategoryService {
   async findOne(field: string) {
     let model = null
     if (checkObjectId(field)){
-      model = await this.categoryModel.findById(field)
+      model = await this.categoryModel.findById(field).populate('product')
+      console.log(model.product)
     } else {
       model = await this.categoryModel.findOne({ slug: field })
     }
@@ -91,7 +93,7 @@ export class CategoryService {
     if (!model) throw HTTP_STATUS.NOT_FOUND('Category not found')
     if (brandIds) {
       await this.relationshipCategoryBrandService.updateCategory({
-        categoryId: model._id?.toString(),
+        categoryId: model._id,
         brandIds
       })
     }

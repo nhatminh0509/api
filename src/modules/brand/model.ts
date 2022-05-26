@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Type } from 'class-transformer'
 import { Types } from 'mongoose'
 import * as MongooseDelete from 'mongoose-delete'
 import { Org } from '../orgs/model'
@@ -23,7 +24,8 @@ export class Brand {
   description?: string
 
   @Prop({ required: true,  type: Types.ObjectId, ref: Org.name })
-  orgId: string
+  @Type(() => Org)
+  orgId: Org
 
   @Prop({ type: Object, default: {} })
   others?: object

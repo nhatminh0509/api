@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import { RelationshipCategoryBrand, RelationshipCategoryBrandDocument } from './model';
 import { UpdateCategoryRelationshipCategoryBrandInput, QueryListRelationshipCategoryBrand, UpdateBrandRelationshipCategoryBrandInput } from './type';
@@ -20,8 +21,8 @@ export class RelationshipCategoryBrandService {
     const insertBrandId = brandIds.filter(item => !allBrandId.includes(item))
     const dataInsert = insertBrandId.map(brandId => {
       return {
-        categoryId,
-        brandId
+        categoryId: new Types.ObjectId(categoryId),
+        brandId: new Types.ObjectId(brandId)
       }
     })
     await this.relationshipModel.deleteMany({
@@ -44,8 +45,8 @@ export class RelationshipCategoryBrandService {
     const insertCategoryId = categoryIds.filter(item => !allCategoryId.includes(item))
     const dataInsert = insertCategoryId.map(categoryId => {
       return {
-        brandId,
-        categoryId
+        brandId: new Types.ObjectId(brandId),
+        categoryId: new Types.ObjectId(categoryId)
       }
     })
     await this.relationshipModel.deleteMany({

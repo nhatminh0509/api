@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { Type } from 'class-transformer'
 import { Types } from 'mongoose'
 import * as MongooseDelete from 'mongoose-delete'
 import { Org } from '../orgs/model'
@@ -11,7 +12,8 @@ export class Keyword {
   key: string
 
   @Prop({ required: true, type: Types.ObjectId, ref: Org.name })
-  orgId: string
+  @Type(() => Org)
+  orgId: Org
 }
 
 export const KeywordSchema = SchemaFactory.createForClass(Keyword).index({ key: 'text' })

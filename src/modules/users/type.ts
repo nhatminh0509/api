@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
+import { IsNotEmpty } from "class-validator"
 import { SORT_DIRECTION } from "src/core/common/constants"
 import { User, UserStatus } from "./model"
 
@@ -20,29 +21,31 @@ export class QueryListUser {
 }
 
 export class CreateUserInput {
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     displayName: string
     
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     username: string
-
+    
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     password: string
     
     @ApiProperty({ required: false })
     avatar?: string
     
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     email: string
     
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     phone: string
 
     @ApiProperty({ required: false })
     roles?: object
-    
-    @ApiProperty({ required: true, enum: UserStatus })
-    status: UserStatus
 }
 
 export class UpdateUserInput {

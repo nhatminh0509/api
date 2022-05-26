@@ -12,6 +12,13 @@ export const CurrentUser = createParamDecorator(
   }
 )
 
+export const CurrentOrg = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest()
+    return request.org
+  }
+)
+
 export const CurrentOrgDomain = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest()

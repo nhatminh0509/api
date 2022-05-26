@@ -4,7 +4,7 @@ import { isEmail } from 'class-validator';
 import { SoftDeleteModel } from 'mongoose-delete';
 import { checkObjectId } from 'src/core/common/function';
 import HTTP_STATUS from 'src/core/common/httpStatus';
-import { User, UserDocument } from './model';
+import { User, UserDocument, UserStatus } from './model';
 import { CreateUserInput, QueryListUser, UpdateUserInput } from './type';
 import * as bcrypt from 'bcrypt'
 
@@ -21,6 +21,7 @@ export class UsersService {
         input.password || '@admin',
         10,
       ),
+      status: UserStatus.Pending
     })
     const userCreated = await model.save()
     return userCreated

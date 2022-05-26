@@ -1,3 +1,4 @@
+import { ProductsModule } from './../modules/product/module';
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppMiddleware } from './app.middleware';
@@ -15,14 +16,18 @@ import config from './common/config';
 
 @Module({
   imports: [
+    AuthModule,
     OrgsModule,
     UsersModule, 
+
     BrandsModule,
     CategoryModule,
+    ProductsModule,
     RelationshipCategoryBrandModule,
+
     KeywordModule,
     FilesModule,
-    AuthModule,
+    
     MongooseModule.forRoot(config.MONGO_URI),
   ],
   controllers: [AppController],

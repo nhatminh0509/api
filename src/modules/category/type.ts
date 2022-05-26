@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger"
+import { IsNotEmpty } from "class-validator"
 import { SORT_DIRECTION } from "src/core/common/constants"
 export class QueryListCategory {
     @ApiProperty({ required: false })
@@ -18,12 +19,15 @@ export class QueryListCategory {
 }
 
 export class CreateCategoryInput {
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     name: string
     
-    @ApiProperty({ required: false })
-    shortName?: string
-
+    @IsNotEmpty()
+    @ApiProperty({ required: true })
+    shortName: string
+    
+    @IsNotEmpty()
     @ApiProperty({ required: true })
     image: string
     
@@ -32,10 +36,10 @@ export class CreateCategoryInput {
     
     @ApiProperty({ required: true })
     orgId: string
-
+    
     @ApiProperty({ required: false })
     brandIds?: string[]
-
+    
     @ApiProperty({ required: false })
     others?: object
 }

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import { NewKeyword, QueryListKeyword } from './type';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class KeywordService {
@@ -20,7 +21,7 @@ export class KeywordService {
     const keysExisted = keywordExisted.map(item => item.key)
     let keyInsert = input.keys.filter(item => !keysExisted.includes(item))
     const dataInsert = keyInsert.map(key => {
-      return { orgId: input.orgId, key }
+      return { orgId: new Types.ObjectId(input.orgId), key }
     })
     const keysCreated = await this.keywordModel.insertMany(dataInsert)
     const result = [...keysCreated.map(item => item._id), ...keywordExisted.map(item => item._id)].map(item => item?.toString())

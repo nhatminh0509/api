@@ -10,7 +10,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UseAuthGuard } from 'src/core/auth/auth.decorator';
+import { CurrentOrg, UseAuthGuard } from 'src/core/auth/auth.decorator';
 import Permissions from 'src/core/permissions';
 import { BrandsService } from './service';
 import { CreateBrandInput, QueryListBrand, UpdateBrandInput } from './type';
@@ -22,8 +22,8 @@ export class BrandsController {
 
   @Post()
   @UseAuthGuard(Permissions.CREATE_BRAND)
-  create(@Body() body: CreateBrandInput) {
-    return this.brandsService.create(body);
+  create(@CurrentOrg() org, @Body() body: CreateBrandInput) {
+    return this.brandsService.create({ ...body, orgId: org?._id});
   }
   
   @Get()
