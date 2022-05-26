@@ -67,7 +67,7 @@ export class CategoryService {
   async findOne(field: string) {
     let model = null
     if (checkObjectId(field)){
-      model = await this.categoryModel.findById(field).populate('product')
+      model = await this.categoryModel.findById(field).populate('products')
       console.log(model.product)
     } else {
       model = await this.categoryModel.findOne({ slug: field })
