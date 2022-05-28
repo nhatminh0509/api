@@ -10,6 +10,8 @@ import { CreateProductInput, QueryListProduct } from './type';
 import AggregateFind from 'src/core/aggregate';
 import HTTP_STATUS from 'src/core/common/httpStatus';
 import mongoError from 'src/core/common/mongoError';
+import { SORT_DIRECTION } from 'src/core/common/constants';
+import { QueryListByKeywords } from 'src/core/common/type';
 
 @Injectable()
 export class ProductsService {
@@ -39,7 +41,7 @@ export class ProductsService {
   }
 
   async findAll(query: QueryListProduct) {
-    const { categories, brands ,searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { categories, brands ,searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
 
     const aggregate = new AggregateFind(this.productModel)
 
@@ -62,6 +64,26 @@ export class ProductsService {
     aggregate.sort(orderBy, direction)
 
     aggregate.select(['name', 'description', 'shortName', 'slug', 'keys.key', 'category.name'])
+
+    aggregate.paginate(skip, limit)
+
+    const { data, total } = await aggregate.exec()
+
+    return {
+      total,
+      data,
+      skip: Number(skip),
+      limit: Number(limit)
+    }
+  }
+
+  async findByKeywords(query: QueryListByKeywords) {
+    const { keywords, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
+    const aggregate = new AggregateFind(this.productModel)
+
+    aggregate.filter('keywords', keywords, true)
+
+    aggregate.sort(orderBy, direction)
 
     aggregate.paginate(skip, limit)
 

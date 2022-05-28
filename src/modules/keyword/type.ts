@@ -8,11 +8,11 @@ export class QueryListKeyword {
     @ApiProperty({ required: false })
     orgId?: string
 
-    @ApiProperty({ required: false })
-    limit?: number
+    // @ApiProperty({ required: false })
+    // limit?: number
 
-    @ApiProperty({ required: false })
-    skip?: number
+    // @ApiProperty({ required: false })
+    // skip?: number
     
     @ApiProperty({ required: false })
     orderBy?: string

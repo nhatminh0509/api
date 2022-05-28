@@ -1,3 +1,4 @@
+import { SearchModule } from './../modules/search/module';
 import { ProductsModule } from './../modules/product/module';
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
@@ -27,6 +28,7 @@ import config from './common/config';
 
     KeywordModule,
     FilesModule,
+    SearchModule,
     
     MongooseModule.forRoot(config.MONGO_URI),
   ],

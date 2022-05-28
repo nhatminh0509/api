@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
+import { SORT_DIRECTION } from 'src/core/common/constants';
 import { RelationshipCategoryBrand, RelationshipCategoryBrandDocument } from './model';
 import { UpdateCategoryRelationshipCategoryBrandInput, QueryListRelationshipCategoryBrand, UpdateBrandRelationshipCategoryBrandInput } from './type';
 
@@ -60,7 +61,7 @@ export class RelationshipCategoryBrandService {
   }
 
   async findAll(query: QueryListRelationshipCategoryBrand) {
-    const { brandSlug, categorySlug, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { brandSlug, categorySlug, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }

@@ -7,6 +7,7 @@ import { generateSlug } from 'src/core/common/function';
 import { Org, OrgDocument } from './model';
 import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './type';
 import { mongoose } from '@typegoose/typegoose';
+import { SORT_DIRECTION } from 'src/core/common/constants';
 
 @Injectable()
 export class OrgsService {
@@ -24,7 +25,7 @@ export class OrgsService {
   }
 
   async findAll(query: QueryListOrg) {
-    const { domain, owner, searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { domain, owner, searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }

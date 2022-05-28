@@ -7,6 +7,7 @@ import HTTP_STATUS from 'src/core/common/httpStatus';
 import { User, UserDocument, UserStatus } from './model';
 import { CreateUserInput, QueryListUser, UpdateUserInput } from './type';
 import * as bcrypt from 'bcrypt'
+import { SORT_DIRECTION } from 'src/core/common/constants';
 
 @Injectable()
 export class UsersService {
@@ -28,7 +29,7 @@ export class UsersService {
   }
 
   async findAll(query: QueryListUser) {
-    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }

@@ -13,6 +13,7 @@ import { OrgsService } from 'src/modules/orgs/service';
 import { checkObjectId } from '../common/function';
 import { UserStatus } from 'src/modules/users/model';
 import { Types } from 'mongoose';
+import { SORT_DIRECTION } from '../common/constants';
 
 @Injectable()
 export class AuthService {
@@ -111,7 +112,7 @@ export class AuthService {
   }
 
   async findAllRole(query: QueryListRole) {
-    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }

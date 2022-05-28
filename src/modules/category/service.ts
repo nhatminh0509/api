@@ -4,13 +4,15 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
-import { checkObjectId, generateSlug } from 'src/core/common/function';
+import { checkObjectId } from 'src/core/common/function';
 import HTTP_STATUS from 'src/core/common/httpStatus';
 import { RelationshipCategoryBrandService } from '../relationship-category-brand/service';
 import { Category, CategoryDocument } from './model';
 import { CreateCategoryInput, QueryListCategory, UpdateCategoryInput } from './type';
 import { KeywordService } from '../keyword/service';
 import AggregateFind from 'src/core/aggregate';
+import { SORT_DIRECTION } from 'src/core/common/constants';
+import { QueryListByKeywords } from 'src/core/common/type';
 
 @Injectable()
 export class CategoryService {
@@ -60,7 +62,7 @@ export class CategoryService {
   }
 
   async findAll(query: QueryListCategory) {
-    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
 
     const aggregate = new AggregateFind(this.categoryModel)
 
@@ -85,6 +87,28 @@ export class CategoryService {
       limit: Number(limit)
     }
   }
+
+
+  async findByKeywords(query: QueryListByKeywords) {
+    const { keywords, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
+    const aggregate = new AggregateFind(this.categoryModel)
+
+    aggregate.filter('keywords', keywords, true)
+
+    aggregate.sort(orderBy, direction)
+
+    aggregate.paginate(skip, limit)
+
+    const { data, total } = await aggregate.exec()
+
+    return {
+      total,
+      data,
+      skip: Number(skip),
+      limit: Number(limit)
+    }
+  }
+
 
   async findOne(field: string) {
     try {

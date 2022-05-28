@@ -9,6 +9,7 @@ import { RelationshipCategoryBrandService } from '../relationship-category-brand
 import { Brand, BrandDocument } from './model';
 import { CreateBrandInput, QueryListBrand, UpdateBrandInput } from './type';
 import mongoError from 'src/core/common/mongoError';
+import { SORT_DIRECTION } from 'src/core/common/constants';
 
 @Injectable()
 export class BrandsService {
@@ -44,7 +45,7 @@ export class BrandsService {
   }
 
   async findAll(query: QueryListBrand) {
-    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }

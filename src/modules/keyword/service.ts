@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import { NewKeyword, QueryListKeyword } from './type';
 import { Types } from 'mongoose';
+import { SORT_DIRECTION } from 'src/core/common/constants';
 
 @Injectable()
 export class KeywordService {
@@ -30,7 +31,7 @@ export class KeywordService {
   }
 
   async findAll(query: QueryListKeyword) {
-    const { searchText, orgId, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { searchText, orgId, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }
@@ -49,8 +50,7 @@ export class KeywordService {
       condition.orgId = orgId
     }
 
-    data = await this.keywordModel.find(condition).sort(sort).skip(skip).limit(limit).select('key')
-    total = await this.keywordModel.countDocuments(condition)
+    data = await this.keywordModel.find(condition).sort(sort).select('key')
     if (searchText) {
       const updateCountId = data.map(item => item._id)
       await this.keywordModel.updateMany({
@@ -62,11 +62,6 @@ export class KeywordService {
       })
     }
 
-    return {
-      data,
-      total,
-      skip: Number(skip),
-      limit: Number(limit)
-    }
+    return data
   }
 }
