@@ -1,4 +1,4 @@
-import { removeVietnameseTones, overrideMethodsAggregate, joinModel, select, searchTextWithRegexAggregate, filterAggregate, convertStringToObjectId, checkObjectId } from './../../core/common/function';
+import { removeVietnameseTones, overrideMethodsAggregate, joinModel, select, searchTextWithRegexAggregate, filterAggregate, convertStringToObjectId, checkObjectId, sortAggregate } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PipelineStage, Types } from 'mongoose';
@@ -37,34 +37,8 @@ export class ProductsService {
 
   async findAll(query: QueryListProduct) {
     const { categories, brands ,searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
-    let sort = {
-      [orderBy]: direction === 'asc' ? 1 : -1
-    }
     let data = []
-    let data2 = []
-    // let total = 0
-    let condition = {}
-
-    if(searchText) { 
-      condition = {
-        ...condition,
-        $text: { $search: searchText }
-      }
-    }
-    console.log(categories)
-    // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).populate('keywords orgId categoryId brandId', 'key domain name count').lean()
-    // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).lean()
-    // total = await this.productModel.countDocuments(condition)
-
-    // const joinModel = { 
-    //   $lookup: {
-    //     from: 'keywords',
-    //     foreignField: '_id',
-    //     localField: 'keywords',
-    //     as: 'keys'
-    //   },
-    // }
-
+    let total = 0
     let aggregate: PipelineStage[] = [overrideMethodsAggregate()]
     // Join
     // aggregate.push(joinModel('keywords', '_id', 'keywords', 'keys'))
@@ -88,6 +62,7 @@ export class ProductsService {
       $count: 'total'
     })
 
+    aggregate.push(sortAggregate(orderBy, direction))
     // Select
     aggregate.push(select(['name', 'description', 'image', 'slug', 'shortName']))
     aggregate.push({
@@ -97,11 +72,10 @@ export class ProductsService {
       $limit: Number(limit)
     })
     data = await this.productModel.aggregateWithDeleted(aggregate)
-    const total  = await this.productModel.aggregateWithDeleted(aggregateCount)
+    total = (await this.productModel.aggregateWithDeleted(aggregateCount))?.[0]?.total || 0
 
     return {
-      // data,
-      total: total?.[0]?.total,
+      total,
       data,
       skip: Number(skip),
       limit: Number(limit)

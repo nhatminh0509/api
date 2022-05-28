@@ -163,7 +163,13 @@ export const filterAggregate = (field: string, values: any[] | any, convertToObj
       }
     }
   }
-  console.log(result)
-  
   return result
+}
+
+export const sortAggregate = (orderBy: string, direction: string) => {
+  return {
+    $sort: {
+      [orderBy]: direction === 'asc' ? 1 : -1
+    }
+  } as any
 }
