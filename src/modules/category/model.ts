@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Type } from 'class-transformer'
 import { Types } from 'mongoose'
 import * as MongooseDelete from 'mongoose-delete'
+import { Keyword } from '../keyword/model'
 import { Org } from '../orgs/model'
 
 export type CategoryDocument = Category & MongooseDelete.SoftDeleteDocument
@@ -35,6 +36,9 @@ export class Category {
 
   @Prop({ required: true, type: [{ type: String, ref: Category.name }], default: [] })
   ancestorsSlug: Category[]
+
+  @Prop({ required: true, type: [{ type: Types.ObjectId, ref: Keyword.name }] })
+  keywords: Keyword[]
 
   @Prop({ type: Object, default: {} })
   others?: object

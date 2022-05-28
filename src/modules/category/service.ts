@@ -9,12 +9,15 @@ import HTTP_STATUS from 'src/core/common/httpStatus';
 import { RelationshipCategoryBrandService } from '../relationship-category-brand/service';
 import { Category, CategoryDocument } from './model';
 import { CreateCategoryInput, QueryListCategory, UpdateCategoryInput } from './type';
+import { KeywordService } from '../keyword/service';
+import AggregateFind from 'src/core/aggregate';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectModel(Category.name) private categoryModel: SoftDeleteModel<CategoryDocument>,
     @Inject(forwardRef(() => RelationshipCategoryBrandService)) private readonly relationshipCategoryBrandService: RelationshipCategoryBrandService,
+    @Inject(forwardRef(() => KeywordService)) private readonly keywordService: KeywordService,
   ) {
     this.categoryModel.createIndexes()
   }
@@ -25,6 +28,12 @@ export class CategoryService {
       if (input.parentSlug) {
         parent = await this.findOne(input.parentSlug)
       }
+      const keywords = input.keywords
+      delete input.keywords
+      const resKeywords = await this.keywordService.newKeyword({
+        orgId: input.orgId,
+        keys: keywords
+      })
       const model = new this.categoryModel({
         name: input.name,
         image: input.image,
@@ -34,6 +43,7 @@ export class CategoryService {
         shortName: input.shortName,
         parentSlug: parent ? parent.slug : null,
         ancestorsSlug: parent ? [parent?.slug, ...parent?.ancestorsSlug] : [],
+        keywords: resKeywords,
         slug: generateSlugNonShortId(input.name)
       })
       const modelCreated = await model.save()
@@ -51,22 +61,22 @@ export class CategoryService {
 
   async findAll(query: QueryListCategory) {
     const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
-    let sort = {
-      [orderBy]: direction === 'asc' ? 1 : -1
-    }
-    let data = []
-    let total = 0
-    let condition = {}
 
-    if(searchText) { 
-      condition = {
-        ...condition,
-        $text: { $search: searchText }
-      }
+    const aggregate = new AggregateFind(this.categoryModel)
+
+    aggregate.joinModel('keywords', '_id', 'keywords', 'keys')
+
+    if (searchText) {
+      aggregate.searchTextWithRegex(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key'])
     }
 
-    data = await this.categoryModel.find(condition).sort(sort).skip(skip).limit(limit)
-    total = await this.categoryModel.countDocuments(condition)
+    aggregate.sort(orderBy, direction)
+
+    aggregate.select(['name', 'description', 'shortName', 'slug', 'keys.key', 'category.name'])
+
+    aggregate.paginate(skip, limit)
+
+    const { data, total } = await aggregate.exec()
 
     return {
       data,

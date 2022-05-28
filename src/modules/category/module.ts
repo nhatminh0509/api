@@ -1,3 +1,4 @@
+import { Keyword } from './../keyword/model';
 import { Global, Module, forwardRef } from '@nestjs/common';
 import { CategoryService } from './service';
 import { CategoryController } from './controller';
@@ -9,7 +10,7 @@ import { RelationshipCategoryBrandModule } from '../relationship-category-brand/
 @Module({
   controllers: [CategoryController],
   providers: [CategoryService],
-  imports: [MongooseModule.forFeature([{ name: Category.name, schema: CategorySchema }]), forwardRef(() => RelationshipCategoryBrandModule)],
+  imports: [MongooseModule.forFeature([{ name: Category.name, schema: CategorySchema }]), forwardRef(() => RelationshipCategoryBrandModule), forwardRef(() => Keyword)],
   exports: [CategoryService]
 })
 export class CategoryModule {}

@@ -42,6 +42,9 @@ export class CreateCategoryInput {
     
     @ApiProperty({ required: false })
     parentSlug?: string
+
+    @ApiProperty({ required: true })
+    keywords: string[]
     
     @ApiProperty({ required: false })
     others?: object
