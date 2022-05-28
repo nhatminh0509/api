@@ -1,4 +1,4 @@
-import { removeVietnameseTones, overrideMethodsAggregate, joinModel, select, searchTextWithRegexAggregate, filterAggregate, convertStringToObjectId, checkObjectId, sortAggregate } from './../../core/common/function';
+import { overrideMethodsAggregate, searchTextWithRegexAggregate, filterAggregate, sortAggregate } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PipelineStage, Types } from 'mongoose';
@@ -7,6 +7,7 @@ import { generateSlug } from 'src/core/common/function';
 import { KeywordService } from '../keyword/service';
 import { Product, ProductDocument } from './product.model';
 import { CreateProductInput, QueryListProduct } from './type';
+import AggregateFind from 'src/core/aggregate';
 
 @Injectable()
 export class ProductsService {
@@ -37,42 +38,32 @@ export class ProductsService {
 
   async findAll(query: QueryListProduct) {
     const { categories, brands ,searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
-    let data = []
-    let total = 0
-    let aggregate: PipelineStage[] = [overrideMethodsAggregate()]
-    // Join
-    // aggregate.push(joinModel('keywords', '_id', 'keywords', 'keys'))
-    // aggregate.push(joinModel('categories', 'slug', 'categorySlug', 'category'))
-    // aggregate.push({ $unwind: '$category' })
 
-    // Query
+    const aggregate = new AggregateFind(this.productModel)
+
+    aggregate.joinModel('keywords', '_id', 'keywords', 'keys')
+
+    aggregate.joinModel('categories', 'slug', 'categorySlug', 'category', true)
+
     if (searchText) {
-      aggregate.push(searchTextWithRegexAggregate(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key']))
+      aggregate.searchTextWithRegex(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key'])
     }
+
     if (categories) {
-      aggregate.push(filterAggregate('categorySlug', categories))
+      aggregate.filter('categorySlug', categories)
     }
 
     if (brands) {
-      aggregate.push(filterAggregate('brandSlug', brands))
+      aggregate.filter('brandSlug', brands)
     }
 
-    const aggregateCount = [...aggregate]
-    aggregateCount.push({
-      $count: 'total'
-    })
+    aggregate.sort(orderBy, direction)
 
-    aggregate.push(sortAggregate(orderBy, direction))
-    // Select
-    aggregate.push(select(['name', 'description', 'image', 'slug', 'shortName']))
-    aggregate.push({
-      $skip: Number(skip)
-    })
-    aggregate.push({
-      $limit: Number(limit)
-    })
-    data = await this.productModel.aggregateWithDeleted(aggregate)
-    total = (await this.productModel.aggregateWithDeleted(aggregateCount))?.[0]?.total || 0
+    aggregate.select(['name', 'description', 'shortName', 'slug', 'keys.key', 'category.name'])
+
+    aggregate.paginate(skip, limit)
+
+    const { data, total } = await aggregate.exec()
 
     return {
       total,

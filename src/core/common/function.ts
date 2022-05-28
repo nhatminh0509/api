@@ -1,6 +1,6 @@
 /* eslint-disable no-process-env */
 import * as dotenv from 'dotenv'
-import { Types } from 'mongoose'
+import { PipelineStage, Types } from 'mongoose'
 import * as shortid from 'shortid'
 
 
@@ -166,10 +166,20 @@ export const filterAggregate = (field: string, values: any[] | any, convertToObj
   return result
 }
 
-export const sortAggregate = (orderBy: string, direction: string) => {
-  return {
-    $sort: {
-      [orderBy]: direction === 'asc' ? 1 : -1
+export const sortAggregate = (orderBy: string | string[], direction: string | string[]) => {
+  if (typeof orderBy === 'string' && typeof direction === 'string') {
+    return {
+      $sort: {
+        [orderBy]: direction === 'asc' ? 1 : -1
+      }
+    } as any
+  } else if (Array.isArray(orderBy) && Array.isArray(direction) && orderBy.length === direction.length) {
+    const result = {
+      $sort: {}
     }
-  } as any
+    orderBy.map((key, index) => {
+      result.$sort[key] = direction[index] === 'asc' ? 1 : -1;
+    })
+    return result
+  }
 }
