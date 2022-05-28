@@ -42,7 +42,7 @@ export class ProductsService {
     }
     let data = []
     let data2 = []
-    let total = 0
+    // let total = 0
     let condition = {}
 
     if(searchText) { 
@@ -54,7 +54,7 @@ export class ProductsService {
     console.log(categories)
     // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).populate('keywords orgId categoryId brandId', 'key domain name count').lean()
     // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).lean()
-    total = await this.productModel.countDocuments(condition)
+    // total = await this.productModel.countDocuments(condition)
 
     // const joinModel = { 
     //   $lookup: {
@@ -83,13 +83,25 @@ export class ProductsService {
       aggregate.push(filterAggregate('brandSlug', brands))
     }
 
+    const aggregateCount = [...aggregate]
+    aggregateCount.push({
+      $count: 'total'
+    })
+
     // Select
     aggregate.push(select(['name', 'description', 'image', 'slug', 'shortName']))
+    aggregate.push({
+      $skip: Number(skip)
+    })
+    aggregate.push({
+      $limit: Number(limit)
+    })
     data = await this.productModel.aggregateWithDeleted(aggregate)
+    const total  = await this.productModel.aggregateWithDeleted(aggregateCount)
 
     return {
       // data,
-      total,
+      total: total?.[0]?.total,
       data,
       skip: Number(skip),
       limit: Number(limit)
