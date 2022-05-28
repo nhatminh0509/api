@@ -148,13 +148,19 @@ export const filterAggregate = (field: string, values: any[] | any, convertToObj
     }
   } else {
     let filter
-    if (convertToObjectId) {
-      filter = checkObjectId(values) ? convertStringToObjectId(values) : null
+    if (typeof values === 'string' && values.includes(',')) {
+      filter = values.trim().split(' ').join('').split(',')
+      console.log(filter)
+      return filterAggregate(field, filter, convertToObjectId)
     } else {
-      filter = values
-    }
-    if (filter) {
-      result.$match[field] = filter;
+      if (convertToObjectId) {
+        filter = checkObjectId(values) ? convertStringToObjectId(values) : null
+      } else {
+        filter = values
+      }
+      if (filter) {
+        result.$match[field] = filter;
+      }
     }
   }
   console.log(result)
