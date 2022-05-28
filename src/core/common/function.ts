@@ -1,5 +1,6 @@
 /* eslint-disable no-process-env */
 import * as dotenv from 'dotenv'
+import { Types } from 'mongoose'
 import * as shortid from 'shortid'
 
 
@@ -13,6 +14,10 @@ export const generateSlug = (field = ''): string => {
 
 export const generateSlugNonShortId = (field = ''): string => {
   return removeVietnameseTones(`${field.split(' ').join('-')}`, false)
+}
+
+export const convertStringToObjectId = (value: string) => {
+  return new Types.ObjectId(value)
 }
 
 export const checkObjectId = (field = ''): boolean => {
@@ -123,5 +128,22 @@ export const searchTextWithRegexAggregate = (search: string | undefined | null, 
       }
     })
   }
+  return result
+}
+
+export const filterAggregate = (field: string, values: any[] | any) => {
+  const result: any = {
+    $match: {}
+  }
+
+  if (Array.isArray(values)) {
+    result.$match[field] = {
+      $in: values
+    }
+    console.log(result)
+  } else {
+    result.$match[field] = values
+  }
+  
   return result
 }

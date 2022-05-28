@@ -4,6 +4,12 @@ import { SORT_DIRECTION } from "src/core/common/constants"
 export class QueryListProduct {
     @ApiProperty({ required: false })
     searchText?: string
+
+    @ApiProperty({ required: false })
+    categoryIds?: string[]
+    
+    @ApiProperty({ required: false })
+    brandIds?: string[]
     
     @ApiProperty({ required: false })
     limit?: number

@@ -1,4 +1,4 @@
-import { removeVietnameseTones, overrideMethodsAggregate, joinModel, select, searchTextWithRegexAggregate } from './../../core/common/function';
+import { removeVietnameseTones, overrideMethodsAggregate, joinModel, select, searchTextWithRegexAggregate, filterAggregate, convertStringToObjectId } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
@@ -36,7 +36,7 @@ export class ProductsService {
   }
 
   async findAll(query: QueryListProduct) {
-    const { searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { categoryIds, brandIds ,searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }
@@ -51,7 +51,7 @@ export class ProductsService {
         $text: { $search: searchText }
       }
     }
-
+    console.log(categoryIds)
     // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).populate('keywords orgId categoryId brandId', 'key domain name count').lean()
     // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).lean()
     total = await this.productModel.countDocuments(condition)
@@ -64,12 +64,29 @@ export class ProductsService {
     //     as: 'keys'
     //   },
     // }
-    data = await this.productModel.aggregateWithDeleted([
-      overrideMethodsAggregate(),
-      joinModel('keywords', '_id', 'keywords', 'keys'),
-      searchTextWithRegexAggregate(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key']),
-      select(['name', 'description', 'image', 'slug', 'shortName','keys.key'])
-    ])
+
+    let aggregate: any[] = [overrideMethodsAggregate()]
+    // Join
+    aggregate.push(joinModel('keywords', '_id', 'keywords', 'keys'))
+
+    // Query
+    if (searchText) {
+      aggregate.push(searchTextWithRegexAggregate(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key']))
+    }
+    
+    if (categoryIds) {
+      let filterValue = Array.isArray(categoryIds) ? categoryIds.map(id => convertStringToObjectId(id) ) : [convertStringToObjectId(categoryIds)]
+      aggregate.push(filterAggregate('categoryId', filterValue))
+    }
+
+    if (brandIds) {
+      let filterValue = Array.isArray(brandIds) ? brandIds.map(id => convertStringToObjectId(id) ) : [convertStringToObjectId(brandIds)]
+      aggregate.push(filterAggregate('brandId', filterValue))
+    }
+
+    // Select
+    aggregate.push(select(['name', 'description', 'image', 'slug', 'shortName','keys.key']))
+    data = await this.productModel.aggregateWithDeleted(aggregate)
 
     return {
       // data,
