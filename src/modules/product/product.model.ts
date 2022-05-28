@@ -28,11 +28,11 @@ export class Product {
 
   @Prop({ required: true, type: String, ref: Brand.name })
   @Type(() => Brand)
-  brand: Brand
+  brandSlug: Brand
 
   @Prop({ required: true, type: String, ref: Category.name })
   @Type(() => Category)
-  category: Category
+  categorySlug: Category
 
   @Prop({ required: true, type: Types.ObjectId, ref: Org.name })
   @Type(() => Org)

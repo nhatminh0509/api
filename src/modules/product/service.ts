@@ -67,24 +67,24 @@ export class ProductsService {
 
     let aggregate: PipelineStage[] = [overrideMethodsAggregate()]
     // Join
-    aggregate.push(joinModel('keywords', '_id', 'keywords', 'keys'))
-    aggregate.push(joinModel('categories', 'slug', 'category', 'category'))
-    aggregate.push({ $unwind: '$category' })
+    // aggregate.push(joinModel('keywords', '_id', 'keywords', 'keys'))
+    // aggregate.push(joinModel('categories', 'slug', 'categorySlug', 'category'))
+    // aggregate.push({ $unwind: '$category' })
 
     // Query
     if (searchText) {
       aggregate.push(searchTextWithRegexAggregate(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key']))
     }
     if (categories) {
-      aggregate.push(filterAggregate('category', categories))
+      aggregate.push(filterAggregate('categorySlug', categories))
     }
 
     if (brands) {
-      aggregate.push(filterAggregate('brand', brands))
+      aggregate.push(filterAggregate('brandSlug', brands))
     }
 
     // Select
-    // aggregate.push(select(['name', 'description', 'image', 'slug', 'shortName','keys.key', 'category']))
+    aggregate.push(select(['name', 'description', 'image', 'slug', 'shortName']))
     data = await this.productModel.aggregateWithDeleted(aggregate)
 
     return {

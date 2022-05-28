@@ -157,6 +157,7 @@ export const filterAggregate = (field: string, values: any[] | any, convertToObj
       result.$match[field] = filter;
     }
   }
+  console.log(result)
   
   return result
 }
