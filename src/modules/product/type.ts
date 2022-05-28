@@ -6,10 +6,10 @@ export class QueryListProduct {
     searchText?: string
 
     @ApiProperty({ required: false })
-    categoryIds?: string[]
+    categories?: string[]
     
     @ApiProperty({ required: false })
-    brandIds?: string[]
+    brands?: string[]
     
     @ApiProperty({ required: false })
     limit?: number

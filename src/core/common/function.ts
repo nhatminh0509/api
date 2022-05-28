@@ -131,18 +131,31 @@ export const searchTextWithRegexAggregate = (search: string | undefined | null, 
   return result
 }
 
-export const filterAggregate = (field: string, values: any[] | any) => {
+export const filterAggregate = (field: string, values: any[] | any, convertToObjectId?: boolean) => {
   const result: any = {
     $match: {}
   }
 
   if (Array.isArray(values)) {
-    result.$match[field] = {
-      $in: values
+    let filter
+    if (convertToObjectId) {
+      filter = values.map(id => checkObjectId(id) ? convertStringToObjectId(id) : null ).filter(item => item !== null)
+    } else {
+      filter = values
     }
-    console.log(result)
+    result.$match[field] = {
+      $in: filter
+    }
   } else {
-    result.$match[field] = values
+    let filter
+    if (convertToObjectId) {
+      filter = checkObjectId(values) ? convertStringToObjectId(values) : null
+    } else {
+      filter = values
+    }
+    if (filter) {
+      result.$match[field] = filter;
+    }
   }
   
   return result

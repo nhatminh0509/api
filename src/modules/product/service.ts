@@ -1,7 +1,7 @@
-import { removeVietnameseTones, overrideMethodsAggregate, joinModel, select, searchTextWithRegexAggregate, filterAggregate, convertStringToObjectId } from './../../core/common/function';
+import { removeVietnameseTones, overrideMethodsAggregate, joinModel, select, searchTextWithRegexAggregate, filterAggregate, convertStringToObjectId, checkObjectId } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
+import { PipelineStage, Types } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import { generateSlug } from 'src/core/common/function';
 import { KeywordService } from '../keyword/service';
@@ -36,7 +36,7 @@ export class ProductsService {
   }
 
   async findAll(query: QueryListProduct) {
-    const { categoryIds, brandIds ,searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { categories, brands ,searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }
@@ -51,7 +51,7 @@ export class ProductsService {
         $text: { $search: searchText }
       }
     }
-    console.log(categoryIds)
+    console.log(categories)
     // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).populate('keywords orgId categoryId brandId', 'key domain name count').lean()
     // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).lean()
     total = await this.productModel.countDocuments(condition)
@@ -65,27 +65,26 @@ export class ProductsService {
     //   },
     // }
 
-    let aggregate: any[] = [overrideMethodsAggregate()]
+    let aggregate: PipelineStage[] = [overrideMethodsAggregate()]
     // Join
     aggregate.push(joinModel('keywords', '_id', 'keywords', 'keys'))
+    aggregate.push(joinModel('categories', 'slug', 'category', 'category'))
+    aggregate.push({ $unwind: '$category' })
 
     // Query
     if (searchText) {
       aggregate.push(searchTextWithRegexAggregate(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key']))
     }
-    
-    if (categoryIds) {
-      let filterValue = Array.isArray(categoryIds) ? categoryIds.map(id => convertStringToObjectId(id) ) : [convertStringToObjectId(categoryIds)]
-      aggregate.push(filterAggregate('categoryId', filterValue))
+    if (categories) {
+      aggregate.push(filterAggregate('category', categories))
     }
 
-    if (brandIds) {
-      let filterValue = Array.isArray(brandIds) ? brandIds.map(id => convertStringToObjectId(id) ) : [convertStringToObjectId(brandIds)]
-      aggregate.push(filterAggregate('brandId', filterValue))
+    if (brands) {
+      aggregate.push(filterAggregate('brand', brands))
     }
 
     // Select
-    aggregate.push(select(['name', 'description', 'image', 'slug', 'shortName','keys.key']))
+    // aggregate.push(select(['name', 'description', 'image', 'slug', 'shortName','keys.key', 'category']))
     data = await this.productModel.aggregateWithDeleted(aggregate)
 
     return {
