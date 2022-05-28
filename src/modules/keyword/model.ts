@@ -10,11 +10,17 @@ export type KeywordDocument = Keyword & MongooseDelete.SoftDeleteDocument
 export class Keyword {
   @Prop({ required: true })
   key: string
+  
+  @Prop({ required: true })
+  subKey: string
+
+  @Prop({ required: true, default: 0 })
+  count: number
 
   @Prop({ required: true, type: Types.ObjectId, ref: Org.name })
   @Type(() => Org)
   orgId: Org
 }
 
-export const KeywordSchema = SchemaFactory.createForClass(Keyword).index({ key: 'text' })
+export const KeywordSchema = SchemaFactory.createForClass(Keyword).index({ key: 'text', subKey: 'text' })
 KeywordSchema.plugin(MongooseDelete, { overrideMethods: 'all' })

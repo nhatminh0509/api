@@ -12,6 +12,7 @@ import config from 'src/core/common/config';
 import { OrgsService } from 'src/modules/orgs/service';
 import { checkObjectId } from '../common/function';
 import { UserStatus } from 'src/modules/users/model';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -103,6 +104,7 @@ export class AuthService {
   async createRoles (input: CreateRoleInput) {
     const model = new this.roleModel({
       ...input,
+      orgId: new Types.ObjectId(input.orgId)
     })
     const modelCreated = await model.save()
     return modelCreated

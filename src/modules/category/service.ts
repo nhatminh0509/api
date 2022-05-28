@@ -1,3 +1,5 @@
+import mongoError from 'src/core/common/mongoError';
+import { generateSlugNonShortId } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
@@ -18,23 +20,29 @@ export class CategoryService {
   }
 
   async create(input: CreateCategoryInput) {
-    const model = new this.categoryModel({
-      name: input.name,
-      image: input.image,
-      description: input.description,
-      others: input.others,
-      orgId: new Types.ObjectId(input.orgId),
-      shortName: input.shortName,
-      slug: generateSlug(input.name)
-    })
-    const modelCreated = await model.save()
-    if (modelCreated) {
-      await this.relationshipCategoryBrandService.updateCategory({
-        categoryId: modelCreated._id?.toString(),
-        brandIds: input.brandIds
+    try {
+      const model = new this.categoryModel({
+        name: input.name,
+        image: input.image,
+        description: input.description,
+        others: input.others,
+        orgId: new Types.ObjectId(input.orgId),
+        shortName: input.shortName,
+        ancestors: input.ancestors,
+        parent: input.parent ? new Types.ObjectId(input.parent) : null,
+        slug: generateSlugNonShortId(input.name)
       })
+      const modelCreated = await model.save()
+      if (modelCreated) {
+        await this.relationshipCategoryBrandService.updateCategory({
+          categoryId: modelCreated._id?.toString(),
+          brandIds: input.brandIds
+        })
+      }
+      return modelCreated  
+    } catch (error) {
+      throw HTTP_STATUS.BAD_REQUEST(mongoError(error))
     }
-    return modelCreated
   }
 
   async findAll(query: QueryListCategory) {
@@ -67,10 +75,9 @@ export class CategoryService {
   async findOne(field: string) {
     let model = null
     if (checkObjectId(field)){
-      model = await this.categoryModel.findById(field).populate('products')
-      console.log(model.product)
+      model = await this.categoryModel.findById(field).populate('products parent ancestors').select('name')
     } else {
-      model = await this.categoryModel.findOne({ slug: field })
+      model = await this.categoryModel.findOne({ slug: field }).populate('products parent ancestors').select('name')
     }
     if (!model) throw HTTP_STATUS.NOT_FOUND('Category not found')
     return model
@@ -78,44 +85,52 @@ export class CategoryService {
 
 
   async update(field: string, input: UpdateCategoryInput) {
-    let model = null
-    let brandIds = input.brandIds
-    delete input.brandIds   
-    let updateInput = { ...input } as any
-    if (updateInput.name) {
-      updateInput.slug = generateSlug(updateInput.name)
+    try {
+      let model = null
+      let brandIds = input.brandIds
+      delete input.brandIds   
+      let updateInput = { ...input } as any
+      if (updateInput.name) {
+        updateInput.slug = generateSlugNonShortId(updateInput.name)
+      }
+      if (checkObjectId(field)){
+        model = await this.categoryModel.findByIdAndUpdate(field, updateInput)
+      } else {
+        model = await this.categoryModel.findOneAndUpdate({ slug: field }, updateInput)
+      }
+      if (!model) throw HTTP_STATUS.NOT_FOUND('Category not found')
+      if (brandIds) {
+        await this.relationshipCategoryBrandService.updateCategory({
+          categoryId: model._id,
+          brandIds
+        })
+      }
+      const updated = await this.categoryModel.findById(model._id)
+      return updated
+    } catch (error) {
+      throw HTTP_STATUS.BAD_REQUEST(mongoError(error))
     }
-    if (checkObjectId(field)){
-      model = await this.categoryModel.findByIdAndUpdate(field, updateInput)
-    } else {
-      model = await this.categoryModel.findOneAndUpdate({ slug: field }, updateInput)
-    }
-    if (!model) throw HTTP_STATUS.NOT_FOUND('Category not found')
-    if (brandIds) {
-      await this.relationshipCategoryBrandService.updateCategory({
-        categoryId: model._id,
-        brandIds
-      })
-    }
-    const updated = await this.findOne(model._id)
-    return updated
   }
 
   async remove(slugOrId: string) {
-    let res = null
-    if (checkObjectId(slugOrId)){
-      res = await this.categoryModel.delete({
-        id: slugOrId
-      })
-    } else {
-      res = await this.categoryModel.delete({
-        slug: slugOrId
-      })
-    }
-    if (res.modifiedCount === 0) {
-      throw HTTP_STATUS.BAD_REQUEST('Delete failed')
-    } else {
-      return HTTP_STATUS.SUCCESS('Delete successfully')
+    try {
+      let res = null
+      if (checkObjectId(slugOrId)){
+        res = await this.categoryModel.delete({
+          id: slugOrId
+        })
+      } else {
+        res = await this.categoryModel.delete({
+          slug: slugOrId
+        })
+      }
+      if (res.modifiedCount === 0) {
+        throw HTTP_STATUS.BAD_REQUEST('Delete failed')
+      } else {
+        return HTTP_STATUS.SUCCESS('Delete successfully')
+      }
+    } catch (error) {
+      throw HTTP_STATUS.BAD_REQUEST(mongoError(error))
     }
   }
 }

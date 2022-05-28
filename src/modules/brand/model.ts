@@ -6,7 +6,9 @@ import { Org } from '../orgs/model'
 
 export type BrandDocument = Brand & MongooseDelete.SoftDeleteDocument
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, toJSON: {
+  virtuals: true
+}})
 export class Brand {
   @Prop({ required: true, unique: true })
   slug: string
@@ -33,3 +35,9 @@ export class Brand {
 
 export const BrandSchema = SchemaFactory.createForClass(Brand).index({ name: 'text', description: 'text', shortName: 'text' })
 BrandSchema.plugin(MongooseDelete, { overrideMethods: 'all' })
+BrandSchema.virtual('products', {
+  ref: 'Product',
+  localField: '_id',
+  foreignField: 'brandId',
+  justOne: false
+})

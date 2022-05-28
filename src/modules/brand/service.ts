@@ -1,3 +1,4 @@
+import { generateSlugNonShortId } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
@@ -7,6 +8,7 @@ import HTTP_STATUS from 'src/core/common/httpStatus';
 import { RelationshipCategoryBrandService } from '../relationship-category-brand/service';
 import { Brand, BrandDocument } from './model';
 import { CreateBrandInput, QueryListBrand, UpdateBrandInput } from './type';
+import mongoError from 'src/core/common/mongoError';
 
 @Injectable()
 export class BrandsService {
@@ -18,23 +20,27 @@ export class BrandsService {
   }
 
   async create(input: CreateBrandInput) {
-    const model = new this.brandModel({
-      name: input.name,
-      image: input.image,
-      description: input.description,
-      others: input.others,
-      orgId: new Types.ObjectId(input.orgId),
-      shortName: input.shortName,
-      slug: generateSlug(input.name)
-    })
-    const modelCreated = await model.save()
-    if (modelCreated) {
-      await this.relationshipCategoryBrandService.updateBrand({
-        brandId: modelCreated._id,
-        categoryIds: input.categoryIds
+    try {
+      const model = new this.brandModel({
+        name: input.name,
+        image: input.image,
+        description: input.description,
+        others: input.others,
+        orgId: new Types.ObjectId(input.orgId),
+        shortName: input.shortName,
+        slug: generateSlugNonShortId(input.name)
       })
+      const modelCreated = await model.save()
+      if (modelCreated && input.categoryIds.length > 0) {
+        await this.relationshipCategoryBrandService.updateBrand({
+          brandId: modelCreated._id,
+          categoryIds: input.categoryIds
+        })
+      }
+      return modelCreated
+    } catch (err) {
+      throw HTTP_STATUS.BAD_REQUEST(mongoError(err))
     }
-    return modelCreated
   }
 
   async findAll(query: QueryListBrand) {
@@ -67,9 +73,9 @@ export class BrandsService {
   async findOne(field: string) {
     let model = null
     if (checkObjectId(field)){
-      model = await this.brandModel.findById(field)
+      model = await this.brandModel.findById(field).populate('products')
     } else {
-      model = await this.brandModel.findOne({ slug: field })
+      model = await this.brandModel.findOne({ slug: field }).populate('products')
     }
     if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
     return model
@@ -77,44 +83,52 @@ export class BrandsService {
 
 
   async update(field: string, input: UpdateBrandInput) {
-    let model = null
-    let categoryIds = input.categoryIds
-    delete input.categoryIds
-    let updateInput = { ...input } as any
-    if (updateInput.name) {
-      updateInput.slug = generateSlug(updateInput.name)
+    try {
+      let model = null
+      let categoryIds = input.categoryIds
+      delete input.categoryIds
+      let updateInput = { ...input } as any
+      if (updateInput.name) {
+        updateInput.slug = generateSlugNonShortId(updateInput.name)
+      }
+      if (checkObjectId(field)){
+        model = await this.brandModel.findByIdAndUpdate(field, updateInput)
+      } else {
+        model = await this.brandModel.findOneAndUpdate({ slug: field }, updateInput)
+      }
+      if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
+      if (categoryIds) {
+        await this.relationshipCategoryBrandService.updateBrand({
+          brandId: model._id,
+          categoryIds
+        })
+      }
+      const updated = await this.findOne(model._id)
+      return updated
+    } catch (error) {
+      throw HTTP_STATUS.BAD_REQUEST(mongoError(error))
     }
-    if (checkObjectId(field)){
-      model = await this.brandModel.findByIdAndUpdate(field, updateInput)
-    } else {
-      model = await this.brandModel.findOneAndUpdate({ slug: field }, updateInput)
-    }
-    if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
-    if (categoryIds) {
-      await this.relationshipCategoryBrandService.updateBrand({
-        brandId: model._id,
-        categoryIds
-      })
-    }
-    const updated = await this.findOne(model._id)
-    return updated
   }
 
   async remove(slugOrId: string) {
-    let res = null
-    if (checkObjectId(slugOrId)){
-      res = await this.brandModel.delete({
-        id: slugOrId
-      })
-    } else {
-      res = await this.brandModel.delete({
-        slug: slugOrId
-      })
-    }
-    if (res.modifiedCount === 0) {
-      throw HTTP_STATUS.BAD_REQUEST('Delete failed')
-    } else {
-      return HTTP_STATUS.SUCCESS('Delete successfully')
+    try {
+      let res = null
+      if (checkObjectId(slugOrId)){
+        res = await this.brandModel.delete({
+          id: slugOrId
+        })
+      } else {
+        res = await this.brandModel.delete({
+          slug: slugOrId
+        })
+      }
+      if (res.modifiedCount === 0) {
+        throw HTTP_STATUS.BAD_REQUEST('Delete failed')
+      } else {
+        return HTTP_STATUS.SUCCESS('Delete successfully')
+      }
+    } catch (error) {
+      throw HTTP_STATUS.BAD_REQUEST(mongoError(error))
     }
   }
 }

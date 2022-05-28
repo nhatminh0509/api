@@ -29,6 +29,13 @@ export class Category {
   @Type(() => Org)
   orgId: Org
 
+  @Prop({ required: false, type: Types.ObjectId, ref: Category.name, default: null })
+  @Type(() => Category)
+  parent?: Category
+
+  @Prop({ required: true, type: [{ type: Types.ObjectId, ref: Category.name }], default: [] })
+  ancestors: Category[]
+
   @Prop({ type: Object, default: {} })
   others?: object
 }

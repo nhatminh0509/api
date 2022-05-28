@@ -39,7 +39,7 @@ export class RelationshipCategoryBrandService {
     const allCategoryId = (await this.relationshipModel.find({
       brandId
     })).map(item => {
-      return item.categoryId
+      return item.categoryId.toString()
     })
     const deleteCategoryId = allCategoryId.filter(item => !categoryIds.includes(item))
     const insertCategoryId = categoryIds.filter(item => !allCategoryId.includes(item))

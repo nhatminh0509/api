@@ -41,6 +41,12 @@ export class CreateCategoryInput {
     brandIds?: string[]
     
     @ApiProperty({ required: false })
+    parent?: string
+    
+    @ApiProperty({ required: false })
+    ancestors?: string[]
+    
+    @ApiProperty({ required: false })
     others?: object
 }
 

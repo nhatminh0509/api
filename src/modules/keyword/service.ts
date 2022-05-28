@@ -1,3 +1,4 @@
+import { removeVietnameseTones } from './../../core/common/function';
 import { Keyword, KeywordDocument } from './model';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -13,7 +14,7 @@ export class KeywordService {
 
   async newKeyword(input: NewKeyword) {
     const keywordExisted = await this.keywordModel.find({
-      orgId: input.orgId,
+      orgId: new Types.ObjectId(input.orgId),
       key: {
         $in: input.keys
       }
@@ -21,7 +22,7 @@ export class KeywordService {
     const keysExisted = keywordExisted.map(item => item.key)
     let keyInsert = input.keys.filter(item => !keysExisted.includes(item))
     const dataInsert = keyInsert.map(key => {
-      return { orgId: new Types.ObjectId(input.orgId), key }
+      return { orgId: new Types.ObjectId(input.orgId), key, subKey: removeVietnameseTones(key), count: 0 }
     })
     const keysCreated = await this.keywordModel.insertMany(dataInsert)
     const result = [...keysCreated.map(item => item._id), ...keywordExisted.map(item => item._id)].map(item => item?.toString())
@@ -40,7 +41,7 @@ export class KeywordService {
     if (searchText) {
       condition = {
         ...condition,
-        $text: { $search: searchText }
+        $text: { $search: removeVietnameseTones(searchText) }
       }
     }
 
@@ -48,8 +49,18 @@ export class KeywordService {
       condition.orgId = orgId
     }
 
-    data = await this.keywordModel.find(condition).sort(sort).skip(skip).limit(limit).populate('categoryId brandId')
+    data = await this.keywordModel.find(condition).sort(sort).skip(skip).limit(limit).select('key')
     total = await this.keywordModel.countDocuments(condition)
+    if (searchText) {
+      const updateCountId = data.map(item => item._id)
+      await this.keywordModel.updateMany({
+        _id: {
+          $in: updateCountId
+        }
+      }, {
+        $inc: { count: 1 }
+      })
+    }
 
     return {
       data,

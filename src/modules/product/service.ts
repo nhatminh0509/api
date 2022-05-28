@@ -1,9 +1,9 @@
+import { removeVietnameseTones, overrideMethodsAggregate, joinModel, select, searchTextWithRegexAggregate } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
-import { checkObjectId, generateSlug } from 'src/core/common/function';
-import HTTP_STATUS from 'src/core/common/httpStatus';
+import { generateSlug } from 'src/core/common/function';
 import { KeywordService } from '../keyword/service';
 import { Product, ProductDocument } from './product.model';
 import { CreateProductInput, QueryListProduct } from './type';
@@ -41,6 +41,7 @@ export class ProductsService {
       [orderBy]: direction === 'asc' ? 1 : -1
     }
     let data = []
+    let data2 = []
     let total = 0
     let condition = {}
 
@@ -51,12 +52,29 @@ export class ProductsService {
       }
     }
 
-    data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).populate('keywords orgId categoryId brandId', 'key domain name').lean()
+    // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).populate('keywords orgId categoryId brandId', 'key domain name count').lean()
+    // data = await this.productModel.find(condition).sort(sort).skip(skip).limit(limit).lean()
     total = await this.productModel.countDocuments(condition)
-    
+
+    // const joinModel = { 
+    //   $lookup: {
+    //     from: 'keywords',
+    //     foreignField: '_id',
+    //     localField: 'keywords',
+    //     as: 'keys'
+    //   },
+    // }
+    data = await this.productModel.aggregateWithDeleted([
+      overrideMethodsAggregate(),
+      joinModel('keywords', '_id', 'keywords', 'keys'),
+      searchTextWithRegexAggregate(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key']),
+      select(['name', 'description', 'image', 'slug', 'shortName','keys.key'])
+    ])
+
     return {
-      data,
+      // data,
       total,
+      data,
       skip: Number(skip),
       limit: Number(limit)
     }

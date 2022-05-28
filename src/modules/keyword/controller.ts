@@ -6,7 +6,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { UseAuthGuard } from 'src/core/auth/auth.decorator';
+import { CurrentOrg, UseAuthGuard } from 'src/core/auth/auth.decorator';
 import { KeywordService } from './service';
 import { NewKeyword, QueryListKeyword } from './type';
 
@@ -17,8 +17,8 @@ export class KeywordController {
 
   @Post()
   @UseAuthGuard()
-  create(@Body() body: NewKeyword) {
-    return this.keywordService.newKeyword(body);
+  create(@CurrentOrg() org, @Body() body: NewKeyword) {
+    return this.keywordService.newKeyword({ ...body, orgId: org?._id });
   }
 
   @Get()
