@@ -31,10 +31,10 @@ export class BrandsService {
         slug: generateSlugNonShortId(input.name)
       })
       const modelCreated = await model.save()
-      if (modelCreated && input.categoryIds.length > 0) {
+      if (modelCreated && input.categoriesSlug.length > 0) {
         await this.relationshipCategoryBrandService.updateBrand({
-          brandId: modelCreated._id,
-          categoryIds: input.categoryIds
+          brandSlug: modelCreated.slug,
+          categoriesSlug: input.categoriesSlug
         })
       }
       return modelCreated
@@ -85,8 +85,8 @@ export class BrandsService {
   async update(field: string, input: UpdateBrandInput) {
     try {
       let model = null
-      let categoryIds = input.categoryIds
-      delete input.categoryIds
+      let categoriesSlug = input.categoriesSlug
+      delete input.categoriesSlug
       let updateInput = { ...input } as any
       if (updateInput.name) {
         updateInput.slug = generateSlugNonShortId(updateInput.name)
@@ -97,10 +97,10 @@ export class BrandsService {
         model = await this.brandModel.findOneAndUpdate({ slug: field }, updateInput)
       }
       if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
-      if (categoryIds) {
+      if (categoriesSlug) {
         await this.relationshipCategoryBrandService.updateBrand({
-          brandId: model._id,
-          categoryIds
+          brandSlug: model.slug,
+          categoriesSlug
         })
       }
       const updated = await this.findOne(model._id)

@@ -21,6 +21,10 @@ export class CategoryService {
 
   async create(input: CreateCategoryInput) {
     try {
+      let parent = null
+      if (input.parentSlug) {
+        parent = await this.findOne(input.parentSlug)
+      }
       const model = new this.categoryModel({
         name: input.name,
         image: input.image,
@@ -28,15 +32,15 @@ export class CategoryService {
         others: input.others,
         orgId: new Types.ObjectId(input.orgId),
         shortName: input.shortName,
-        ancestors: input.ancestors,
-        parent: input.parent ? new Types.ObjectId(input.parent) : null,
+        parentSlug: parent ? parent.slug : null,
+        ancestorsSlug: parent ? [parent?.slug, ...parent?.ancestorsSlug] : [],
         slug: generateSlugNonShortId(input.name)
       })
       const modelCreated = await model.save()
-      if (modelCreated) {
+      if (modelCreated && input.brandsSlug && input.brandsSlug.length > 0) {
         await this.relationshipCategoryBrandService.updateCategory({
-          categoryId: modelCreated._id?.toString(),
-          brandIds: input.brandIds
+          categorySlug: modelCreated.slug,
+          brandsSlug: input.brandsSlug
         })
       }
       return modelCreated  
@@ -73,22 +77,26 @@ export class CategoryService {
   }
 
   async findOne(field: string) {
-    let model = null
-    if (checkObjectId(field)){
-      model = await this.categoryModel.findById(field).populate('products parent ancestors').select('name')
-    } else {
-      model = await this.categoryModel.findOne({ slug: field }).populate('products parent ancestors').select('name')
+    try {
+      let model = null
+      if (checkObjectId(field)){
+        model = await (await this.categoryModel.findById(field))
+      } else {
+        model = await (await this.categoryModel.findOne({ slug: field }))
+      }
+      if (!model) throw HTTP_STATUS.NOT_FOUND('Category not found')
+      return model
+    } catch (error) {
+      throw HTTP_STATUS.BAD_REQUEST(mongoError(error))
     }
-    if (!model) throw HTTP_STATUS.NOT_FOUND('Category not found')
-    return model
   }
 
 
   async update(field: string, input: UpdateCategoryInput) {
     try {
       let model = null
-      let brandIds = input.brandIds
-      delete input.brandIds   
+      let brandsSlug = input.brandsSlug
+      delete input.brandsSlug   
       let updateInput = { ...input } as any
       if (updateInput.name) {
         updateInput.slug = generateSlugNonShortId(updateInput.name)
@@ -99,10 +107,10 @@ export class CategoryService {
         model = await this.categoryModel.findOneAndUpdate({ slug: field }, updateInput)
       }
       if (!model) throw HTTP_STATUS.NOT_FOUND('Category not found')
-      if (brandIds) {
+      if (brandsSlug) {
         await this.relationshipCategoryBrandService.updateCategory({
-          categoryId: model._id,
-          brandIds
+          categorySlug: model?.slug,
+          brandsSlug
         })
       }
       const updated = await this.categoryModel.findById(model._id)

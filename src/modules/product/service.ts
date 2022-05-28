@@ -1,4 +1,4 @@
-import { overrideMethodsAggregate, searchTextWithRegexAggregate, filterAggregate, sortAggregate } from './../../core/common/function';
+import { overrideMethodsAggregate, searchTextWithRegexAggregate, filterAggregate, sortAggregate, checkObjectId } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { PipelineStage, Types } from 'mongoose';
@@ -8,6 +8,8 @@ import { KeywordService } from '../keyword/service';
 import { Product, ProductDocument } from './product.model';
 import { CreateProductInput, QueryListProduct } from './type';
 import AggregateFind from 'src/core/aggregate';
+import HTTP_STATUS from 'src/core/common/httpStatus';
+import mongoError from 'src/core/common/mongoError';
 
 @Injectable()
 export class ProductsService {
@@ -70,6 +72,21 @@ export class ProductsService {
       data,
       skip: Number(skip),
       limit: Number(limit)
+    }
+  }
+
+  async findOne(field: string) {
+    try {
+      let model = null
+      if (checkObjectId(field)){
+        model = await this.productModel.findById(field)
+      } else {
+        model = await this.productModel.findOne({ slug: field })
+      }
+      if (!model) throw HTTP_STATUS.NOT_FOUND('Product not found')
+      return model
+    } catch (error) {
+      throw HTTP_STATUS.BAD_REQUEST(mongoError(error))      
     }
   }
 }

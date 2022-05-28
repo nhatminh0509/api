@@ -29,12 +29,12 @@ export class Category {
   @Type(() => Org)
   orgId: Org
 
-  @Prop({ required: false, type: Types.ObjectId, ref: Category.name, default: null })
+  @Prop({ required: false, type: String, ref: Category.name, default: null })
   @Type(() => Category)
-  parent?: Category
+  parentSlug?: Category
 
-  @Prop({ required: true, type: [{ type: Types.ObjectId, ref: Category.name }], default: [] })
-  ancestors: Category[]
+  @Prop({ required: true, type: [{ type: String, ref: Category.name }], default: [] })
+  ancestorsSlug: Category[]
 
   @Prop({ type: Object, default: {} })
   others?: object
@@ -47,4 +47,16 @@ CategorySchema.virtual('products', {
   localField: '_id',
   foreignField: 'categoryId',
   justOne: false
+})
+CategorySchema.virtual('ancestors', {
+  ref: 'Category',
+  localField: 'ancestorsSlug',
+  foreignField: 'slug',
+  justOne: false
+})
+CategorySchema.virtual('parent', {
+  ref: 'Category',
+  localField: 'parentSlug',
+  foreignField: 'slug',
+  justOne: true,
 })

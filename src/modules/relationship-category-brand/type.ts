@@ -2,10 +2,10 @@ import { ApiProperty } from "@nestjs/swagger"
 import { SORT_DIRECTION } from "src/core/common/constants"
 export class QueryListRelationshipCategoryBrand {
     @ApiProperty({ required: false })
-    categoryId?: string
+    categorySlug?: string
 
     @ApiProperty({ required: false })
-    brandId?: string
+    brandSlug?: string
     
     @ApiProperty({ required: false })
     limit?: number
@@ -22,16 +22,16 @@ export class QueryListRelationshipCategoryBrand {
 
 export class UpdateCategoryRelationshipCategoryBrandInput {
     @ApiProperty({ required: true })
-    categoryId: string
+    categorySlug: string
 
     @ApiProperty({ required: true })
-    brandIds: string[]
+    brandsSlug: string[]
 }
 
 export class UpdateBrandRelationshipCategoryBrandInput {
     @ApiProperty({ required: true })
-    brandId: string
+    brandSlug: string
 
     @ApiProperty({ required: true })
-    categoryIds: string[]
+    categoriesSlug: string[]
 }

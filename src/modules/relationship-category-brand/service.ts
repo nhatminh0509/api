@@ -11,48 +11,48 @@ export class RelationshipCategoryBrandService {
     this.relationshipModel.createIndexes()
   }
 
-  async updateCategory({ brandIds, categoryId }: UpdateCategoryRelationshipCategoryBrandInput) {
-    const allBrandId = (await this.relationshipModel.find({
-      categoryId
+  async updateCategory({ brandsSlug, categorySlug }: UpdateCategoryRelationshipCategoryBrandInput) {
+    const allBrand = (await this.relationshipModel.find({
+      categorySlug
     })).map(item => {
-      return item.brandId
+      return item.brandSlug
     })
-    const deleteBrandId = allBrandId.filter(item => !brandIds.includes(item))
-    const insertBrandId = brandIds.filter(item => !allBrandId.includes(item))
-    const dataInsert = insertBrandId.map(brandId => {
+    const deleteBrand = allBrand.filter(item => !brandsSlug.includes(item))
+    const insertBrand = brandsSlug.filter(item => !allBrand.includes(item))
+    const dataInsert = insertBrand.map(brandSlug => {
       return {
-        categoryId: new Types.ObjectId(categoryId),
-        brandId: new Types.ObjectId(brandId)
+        categorySlug,
+        brandSlug
       }
     })
     await this.relationshipModel.deleteMany({
-      categoryId,
-      brandId: {
-        $in: deleteBrandId
+      categorySlug,
+      brandSlug: {
+        $in: deleteBrand
       }
     })
     const insert = await this.relationshipModel.insertMany(dataInsert)
     return insert
   }
   
-  async updateBrand({ brandId, categoryIds }: UpdateBrandRelationshipCategoryBrandInput) {
-    const allCategoryId = (await this.relationshipModel.find({
-      brandId
+  async updateBrand({ brandSlug, categoriesSlug }: UpdateBrandRelationshipCategoryBrandInput) {
+    const allCategory = (await this.relationshipModel.find({
+      brandSlug
     })).map(item => {
-      return item.categoryId.toString()
+      return item.categorySlug
     })
-    const deleteCategoryId = allCategoryId.filter(item => !categoryIds.includes(item))
-    const insertCategoryId = categoryIds.filter(item => !allCategoryId.includes(item))
-    const dataInsert = insertCategoryId.map(categoryId => {
+    const deleteCategory = allCategory.filter(item => !categoriesSlug.includes(item))
+    const insertCategory = categoriesSlug.filter(item => !allCategory.includes(item))
+    const dataInsert = insertCategory.map(categorySlug => {
       return {
-        brandId: new Types.ObjectId(brandId),
-        categoryId: new Types.ObjectId(categoryId)
+        brandSlug,
+        categorySlug
       }
     })
     await this.relationshipModel.deleteMany({
-      brandId,
-      categoryId: {
-        $in: deleteCategoryId
+      brandSlug,
+      category: {
+        $in: deleteCategory
       }
     })
     const insert = await this.relationshipModel.insertMany(dataInsert)
@@ -60,22 +60,22 @@ export class RelationshipCategoryBrandService {
   }
 
   async findAll(query: QueryListRelationshipCategoryBrand) {
-    const { brandId, categoryId, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
+    const { brandSlug, categorySlug, skip = 0, limit = 20, orderBy = 'createdAt', direction = 'desc' } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }
     let data = []
     let total = 0
     let condition = {} as any
-    if (brandId) {
-      condition.brandId = brandId
+    if (brandSlug) {
+      condition.brandSlug = brandSlug
     }
 
-    if (categoryId) {
-      condition.categoryId= categoryId
+    if (categorySlug) {
+      condition.categorySlug = categorySlug
     }
 
-    data = await this.relationshipModel.find(condition).sort(sort).skip(skip).limit(limit).populate('categoryId brandId')
+    data = await this.relationshipModel.find(condition).sort(sort).skip(skip).limit(limit)
     total = await this.relationshipModel.countDocuments(condition)
 
     return {

@@ -38,7 +38,7 @@ export class CreateBrandInput {
     orgId: string
     
     @ApiProperty({ required: false })
-    categoryIds?: string[]
+    categoriesSlug?: string[]
     
     @ApiProperty({ required: false })
     others?: object
@@ -61,7 +61,7 @@ export class UpdateBrandInput {
     orgId?: string
     
     @ApiProperty({ required: false })
-    categoryIds?: string[]
+    categoriesSlug?: string[]
     
     @ApiProperty({ required: false })
     others?: object
