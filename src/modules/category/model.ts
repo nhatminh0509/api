@@ -26,9 +26,9 @@ export class Category {
   @Prop({ required: false, default: '' })
   description?: string
 
-  @Prop({ required: true,  type: Types.ObjectId, ref: Org.name })
+  @Prop({ required: true,  type: String, ref: Org.name })
   @Type(() => Org)
-  orgId: Org
+  orgSlug: Org
 
   @Prop({ required: false, type: String, ref: Category.name, default: null })
   @Type(() => Category)

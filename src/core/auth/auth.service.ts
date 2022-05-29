@@ -105,7 +105,6 @@ export class AuthService {
   async createRoles (input: CreateRoleInput) {
     const model = new this.roleModel({
       ...input,
-      orgId: new Types.ObjectId(input.orgId)
     })
     const modelCreated = await model.save()
     return modelCreated
@@ -141,10 +140,7 @@ export class AuthService {
   async findOneRole(field: string) {
     let model = null
     if (checkObjectId(field)){
-      model = await (await this.roleModel.findById(field)).populate({
-        path: 'orgId',
-        match: { _id: { $ne: null }}
-      })
+      model = await (await this.roleModel.findById(field))
     }
     if (!model) throw HTTP_STATUS.NOT_FOUND('Role not found')
     return model

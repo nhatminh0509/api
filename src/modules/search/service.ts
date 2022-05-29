@@ -13,8 +13,8 @@ export class SearchService {
   ) {}
 
   async search(query: Search) {
-    const { searchText, orgId, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
-    const keywords = await this.keywordService.findAll({ searchText, orgId })
+    const { searchText, orgSlug, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
+    const keywords = await this.keywordService.findAll({ searchText, orgSlug })
     const idsKeyword = keywords.map(item => item._id)
     const product = await this.productService.findByKeywords({
       keywords: idsKeyword,

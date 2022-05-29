@@ -22,17 +22,14 @@ export class BrandsService {
 
   async create(input: CreateBrandInput) {
     try {
+      const categoriesSlug = input.categoriesSlug
+      delete input.categoriesSlug
       const model = new this.brandModel({
-        name: input.name,
-        image: input.image,
-        description: input.description,
-        others: input.others,
-        orgId: new Types.ObjectId(input.orgId),
-        shortName: input.shortName,
+        ...input,
         slug: generateSlugNonShortId(input.name)
       })
       const modelCreated = await model.save()
-      if (modelCreated && input.categoriesSlug.length > 0) {
+      if (modelCreated && categoriesSlug &&categoriesSlug?.length > 0) {
         await this.relationshipCategoryBrandService.updateBrand({
           brandSlug: modelCreated.slug,
           categoriesSlug: input.categoriesSlug
@@ -74,9 +71,9 @@ export class BrandsService {
   async findOne(field: string) {
     let model = null
     if (checkObjectId(field)){
-      model = await this.brandModel.findById(field).populate('products')
+      model = await this.brandModel.findById(field)
     } else {
-      model = await this.brandModel.findOne({ slug: field }).populate('products')
+      model = await this.brandModel.findOne({ slug: field })
     }
     if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
     return model

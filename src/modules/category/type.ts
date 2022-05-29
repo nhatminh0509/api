@@ -35,7 +35,7 @@ export class CreateCategoryInput {
     description?: string
     
     @ApiProperty({ required: true })
-    orgId: string
+    orgSlug: string
     
     @ApiProperty({ required: false })
     brandsSlug?: string[]
@@ -62,9 +62,6 @@ export class UpdateCategoryInput {
     
     @ApiProperty({ required: false })
     description?: string
-
-    @ApiProperty({ required: false })
-    orgId?: string
 
     @ApiProperty({ required: false })
     brandsSlug?: string[]

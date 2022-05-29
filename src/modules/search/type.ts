@@ -6,7 +6,7 @@ export class Search {
   searchText?: string
 
   @ApiProperty({ required: false })
-  orgId?: string
+  orgSlug?: string
   
   @ApiProperty({ required: false })
   limit?: number

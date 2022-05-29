@@ -26,7 +26,7 @@ export class ProductsService {
     const keywords = input.keywords
     delete input.keywords
     const resKeywords = await this.keywordService.newKeyword({
-      orgId: input.orgId,
+      orgSlug: input.orgSlug,
       keys: keywords
     })
     const product = new this.productModel({

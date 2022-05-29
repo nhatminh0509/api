@@ -34,9 +34,9 @@ export class Product {
   @Type(() => Category)
   categorySlug: Category
 
-  @Prop({ required: true, type: Types.ObjectId, ref: Org.name })
+  @Prop({ required: true, type: String, ref: Org.name })
   @Type(() => Org)
-  orgId: Org
+  orgSlug: Org
 
   @Prop({ required: true, type: [{ type: Types.ObjectId, ref: Keyword.name }] })
   keywords: Keyword[]

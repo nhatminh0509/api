@@ -15,7 +15,7 @@ export class KeywordService {
 
   async newKeyword(input: NewKeyword) {
     const keywordExisted = await this.keywordModel.find({
-      orgId: new Types.ObjectId(input.orgId),
+      orgSlug: input.orgSlug,
       key: {
         $in: input.keys
       }
@@ -23,7 +23,7 @@ export class KeywordService {
     const keysExisted = keywordExisted.map(item => item.key)
     let keyInsert = input.keys.filter(item => !keysExisted.includes(item))
     const dataInsert = keyInsert.map(key => {
-      return { orgId: new Types.ObjectId(input.orgId), key, subKey: removeVietnameseTones(key), count: 0 }
+      return { orgSlug: input.orgSlug, key, subKey: removeVietnameseTones(key), count: 0 }
     })
     const keysCreated = await this.keywordModel.insertMany(dataInsert)
     const result = [...keysCreated.map(item => item._id), ...keywordExisted.map(item => item._id)].map(item => item?.toString())
@@ -31,12 +31,11 @@ export class KeywordService {
   }
 
   async findAll(query: QueryListKeyword) {
-    const { searchText, orgId, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
+    const { searchText, orgSlug, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
     let sort = {
       [orderBy]: direction === 'asc' ? 1 : -1
     }
     let data = []
-    let total = 0
     let condition = {} as any
     
     if (searchText) {
@@ -46,8 +45,8 @@ export class KeywordService {
       }
     }
 
-    if (orgId) {
-      condition.orgId = orgId
+    if (orgSlug) {
+      condition.orgSlug = orgSlug
     }
 
     data = await this.keywordModel.find(condition).sort(sort).select('key')

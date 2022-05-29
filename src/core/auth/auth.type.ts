@@ -21,7 +21,7 @@ export class CreateRoleInput {
   priority: number
 
   @ApiProperty({ required: false, default: null })
-  orgId?: string
+  orgSlug?: string
 }
 
 export class UpdateRoleInput {
@@ -33,9 +33,6 @@ export class UpdateRoleInput {
 
   @ApiProperty({ required: false })
   priority?: number
-
-  @ApiProperty({ required: false })
-  orgId?: string
 }
 
 export class QueryListRole {

@@ -33,7 +33,7 @@ export class CategoryService {
       const keywords = input.keywords
       delete input.keywords
       const resKeywords = await this.keywordService.newKeyword({
-        orgId: input.orgId,
+        orgSlug: input.orgSlug,
         keys: keywords
       })
       const model = new this.categoryModel({
@@ -41,7 +41,7 @@ export class CategoryService {
         image: input.image,
         description: input.description,
         others: input.others,
-        orgId: new Types.ObjectId(input.orgId),
+        orgSlug: input.orgSlug,
         shortName: input.shortName,
         parentSlug: parent ? parent.slug : null,
         ancestorsSlug: parent ? [parent?.slug, ...parent?.ancestorsSlug] : [],

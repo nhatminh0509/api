@@ -17,9 +17,9 @@ export class Keyword {
   @Prop({ required: true, default: 0 })
   count: number
 
-  @Prop({ required: true, type: Types.ObjectId, ref: Org.name })
+  @Prop({ required: true, type: String, ref: Org.name })
   @Type(() => Org)
-  orgId: Org
+  orgSlug: Org
 }
 
 export const KeywordSchema = SchemaFactory.createForClass(Keyword).index({ key: 'text', subKey: 'text' })

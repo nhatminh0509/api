@@ -49,7 +49,7 @@ export class CreateProductInput {
     brandId: string
 
     @ApiProperty({ required: true, nullable: false })
-    orgId: string
+    orgSlug: string
     
     @ApiProperty({ required: true })
     keywords: string[]

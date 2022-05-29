@@ -13,7 +13,7 @@ export const generateSlug = (field = ''): string => {
 }
 
 export const generateSlugNonShortId = (field = ''): string => {
-  return removeVietnameseTones(`${field.split(' ').join('-')}`, false)
+  return `${field.split(' ').join('-')}`
 }
 
 export const convertStringToObjectId = (value: string) => {

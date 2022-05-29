@@ -6,7 +6,7 @@ export class QueryListKeyword {
     searchText?: string
 
     @ApiProperty({ required: false })
-    orgId?: string
+    orgSlug?: string
 
     // @ApiProperty({ required: false })
     // limit?: number
@@ -23,7 +23,7 @@ export class QueryListKeyword {
 
 export class NewKeyword {
     @ApiProperty({ required: true })
-    orgId: string
+    orgSlug: string
     
     @IsNotEmpty()
     @ApiProperty({ required: true })
