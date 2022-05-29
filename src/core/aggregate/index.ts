@@ -56,7 +56,7 @@ class AggregateFind {
 
   async exec() {
     const data = await this.model.aggregateWithDeleted(this.pipelineStages)
-    const total = (await this.model.aggregateWithDeleted(this.pipelineStagesCount))?.[0]?.total || 0
+    const total = this.pipelineStagesCount.length > 0 ? (await this.model.aggregateWithDeleted(this.pipelineStagesCount))?.[0]?.total || 0 : 0
     return { data, total }
   }
 } 

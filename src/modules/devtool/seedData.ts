@@ -5,7 +5,6 @@ const seedData = {
     name: 'admin',
     permissions: [Permissions.ALL],
     priority: 10,
-    orgSlug: 'dev-tools',
     slug: 'dev-tools-admin'
   },
   user: {

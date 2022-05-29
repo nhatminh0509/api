@@ -23,7 +23,7 @@ export class BrandsController {
   @Post()
   @UseAuthGuard(Permissions.CREATE_BRAND)
   create(@CurrentOrg() org, @Body() body: CreateBrandInput) {
-    return this.brandsService.create({ ...body, orgSlug: org?.slug});
+    return this.brandsService.create({ ...body, orgId: org?._id });
   }
   
   @Get()

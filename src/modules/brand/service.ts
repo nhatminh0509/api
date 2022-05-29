@@ -9,6 +9,8 @@ import { Brand, BrandDocument } from './model';
 import { CreateBrandInput, QueryListBrand, UpdateBrandInput } from './type';
 import mongoError from 'src/core/common/mongoError';
 import { SORT_DIRECTION } from 'src/core/common/constants';
+import { Types } from 'mongoose';
+import AggregateFind from 'src/core/aggregate';
 
 @Injectable()
 export class BrandsService {
@@ -25,6 +27,7 @@ export class BrandsService {
       delete input.categoryIds
       const model = new this.brandModel({
         ...input,
+        orgId: new Types.ObjectId(input.orgId),
         slug: await generateSlugUnique(this.brandModel, input.name)
       })
       const modelCreated = await model.save()
@@ -123,5 +126,17 @@ export class BrandsService {
     } catch (error) {
       throw HTTP_STATUS.BAD_REQUEST(mongoError(error))
     }
+  }
+
+  async convertSlugToId(slugs: string[]) {
+    const aggregate = new AggregateFind(this.brandModel)
+
+    aggregate.filter('slug', slugs)
+
+    aggregate.select(['_id'])
+
+    const { data } = await aggregate.exec()
+
+    return data.map(item => new Types.ObjectId(item._id))
   }
 }

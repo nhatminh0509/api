@@ -18,7 +18,7 @@ export class KeywordController {
   @Post()
   @UseAuthGuard()
   create(@CurrentOrg() org, @Body() body: NewKeyword) {
-    return this.keywordService.newKeyword({ ...body, orgSlug: org?.slug });
+    return this.keywordService.newKeyword({ ...body, orgId: org?._id });
   }
 
   @Get()

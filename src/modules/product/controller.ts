@@ -23,7 +23,7 @@ export class ProductsController {
   @Post()
   @UseAuthGuard()
   create(@CurrentOrg() org, @Body() body: CreateProductInput) {
-    return this.productService.create({ ...body, orgSlug: org?.slug });
+    return this.productService.create({ ...body, orgId: org?._id });
   }
 
   @Get()

@@ -23,7 +23,7 @@ export class QueryListKeyword {
 
 export class NewKeyword {
     @ApiProperty({ required: true })
-    orgSlug: string
+    orgId: string
     
     @IsNotEmpty()
     @ApiProperty({ required: true })

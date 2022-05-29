@@ -26,17 +26,17 @@ export class Product {
   @Prop({ required: false, default: '' })
   description?: string
 
-  @Prop({ required: true, type: String, ref: Brand.name })
+  @Prop({ required: true, type: Types.ObjectId, ref: Brand.name })
   @Type(() => Brand)
-  brandSlug: Brand
+  brandId: Brand
 
-  @Prop({ required: true, type: String, ref: Category.name })
+  @Prop({ required: true, type: Types.ObjectId, ref: Category.name })
   @Type(() => Category)
-  categorySlug: Category
+  categoryId: Category
 
-  @Prop({ required: true, type: String, ref: Org.name })
+  @Prop({ required: true, type: Types.ObjectId, ref: Org.name })
   @Type(() => Org)
-  orgSlug: Org
+  orgId: Org
 
   @Prop({ required: true, type: [{ type: Types.ObjectId, ref: Keyword.name }] })
   keywords: Keyword[]

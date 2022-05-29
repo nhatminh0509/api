@@ -35,13 +35,13 @@ export class CreateCategoryInput {
     description?: string
     
     @ApiProperty({ required: true })
-    orgSlug: string
+    orgId: string
     
     @ApiProperty({ required: false })
     brandIds?: string[]
     
     @ApiProperty({ required: false })
-    parentSlug?: string
+    parentId?: string
 
     @ApiProperty({ required: true })
     keywords: string[]

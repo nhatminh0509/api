@@ -32,10 +32,17 @@ export class DevtoolService implements OnApplicationBootstrap {
       await this.orgService.findOne(seedData.org.slug)
     } catch (_) {
       // Handle insert seed data
+      
+      // Org
+      const org = await this.orgService.create({
+        ...seedData.org
+      })
+      this.logger.log('Generate org')
 
       // Role
       await this.authService.createRoles({
-        ...seedData.role
+        ...seedData.role,
+        orgId: org?._id
       })
       this.logger.log('Generate role')
       
@@ -45,11 +52,6 @@ export class DevtoolService implements OnApplicationBootstrap {
       })
       this.logger.log('Generate user')
       
-      // Org
-      await this.orgService.create({
-        ...seedData.org
-      })
-      this.logger.log('Generate org')
     }
   }
 }

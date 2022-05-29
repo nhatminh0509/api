@@ -12,12 +12,16 @@ import HTTP_STATUS from 'src/core/common/httpStatus';
 import mongoError from 'src/core/common/mongoError';
 import { SORT_DIRECTION } from 'src/core/common/constants';
 import { QueryListByKeywords } from 'src/core/common/type';
+import { CategoryService } from '../category/service';
+import { BrandsService } from '../brand/service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: SoftDeleteModel<ProductDocument>,
-    @Inject(forwardRef(() => KeywordService)) private readonly keywordService: KeywordService
+    @Inject(forwardRef(() => KeywordService)) private readonly keywordService: KeywordService,
+    @Inject(forwardRef(() => CategoryService)) private readonly categoryService: CategoryService,
+    @Inject(forwardRef(() => BrandsService)) private readonly brandService: BrandsService
   ) {
     this.productModel.createIndexes()
   }
@@ -26,11 +30,14 @@ export class ProductsService {
     const keywords = input.keywords
     delete input.keywords
     const resKeywords = await this.keywordService.newKeyword({
-      orgSlug: input.orgSlug,
+      orgId: input.orgId,
       keys: keywords
     })
     const product = new this.productModel({
       ...input,
+      orgId: new Types.ObjectId(input.orgId),
+      brandId: new Types.ObjectId(input.brandId),
+      categoryId: new Types.ObjectId(input.categoryId),
       slug: generateSlug(input.name),
       keywords: resKeywords
     })
@@ -45,7 +52,7 @@ export class ProductsService {
 
     aggregate.joinModel('keywords', '_id', 'keywords', 'keys')
 
-    aggregate.joinModel('categories', 'slug', 'categorySlug', 'category', true)
+    aggregate.joinModel('categories', '_id', 'categoryId', 'category', true)
 
     aggregate.joinModel('keywords', '_id', 'category.keywords', 'category.keys')
 
@@ -54,11 +61,13 @@ export class ProductsService {
     }
 
     if (categories) {
-      aggregate.filter(['categorySlug', 'category.ancestorsSlug'], categories)
+      const categoryIds = await this.categoryService.convertSlugToId(categories)
+      aggregate.filter(['categoryId', 'category.ancestorIds'], categoryIds, true)
     }
-
+    
     if (brands) {
-      aggregate.filter('brandSlug', brands)
+      const brandIds = await this.brandService.convertSlugToId(brands)
+      aggregate.filter('brandId', brandIds)
     }
 
     aggregate.sort(orderBy, direction)

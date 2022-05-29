@@ -15,7 +15,7 @@ export class KeywordService {
 
   async newKeyword(input: NewKeyword) {
     const keywordExisted = await this.keywordModel.find({
-      orgSlug: input.orgSlug,
+      orgId: new Types.ObjectId(input.orgId),
       key: {
         $in: input.keys
       }
@@ -23,10 +23,10 @@ export class KeywordService {
     const keysExisted = keywordExisted.map(item => item.key)
     let keyInsert = input.keys.filter(item => !keysExisted.includes(item))
     const dataInsert = keyInsert.map(key => {
-      return { orgSlug: input.orgSlug, key, subKey: removeVietnameseTones(key), count: 0 }
+      return { orgId: new Types.ObjectId(input.orgId), key, subKey: removeVietnameseTones(key), count: 0 }
     })
     const keysCreated = await this.keywordModel.insertMany(dataInsert)
-    const result = [...keysCreated.map(item => item._id), ...keywordExisted.map(item => item._id)].map(item => item?.toString())
+    const result = [...keysCreated.map(item => new Types.ObjectId(item._id)), ...keywordExisted.map(item => new Types.ObjectId(item._id))]
     return result
   }
 

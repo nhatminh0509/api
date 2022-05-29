@@ -26,16 +26,16 @@ export class Category {
   @Prop({ required: false, default: '' })
   description?: string
 
-  @Prop({ required: true,  type: String, ref: Org.name })
+  @Prop({ required: true,  type: Types.ObjectId, ref: Org.name })
   @Type(() => Org)
-  orgSlug: Org
+  orgId: Org
 
-  @Prop({ required: false, type: String, ref: Category.name, default: null })
+  @Prop({ required: false, type: Types.ObjectId, ref: Category.name, default: null })
   @Type(() => Category)
-  parentSlug?: Category
+  parentId?: Category
 
-  @Prop({ required: true, type: [{ type: String, ref: Category.name }], default: [] })
-  ancestorsSlug: Category[]
+  @Prop({ required: true, type: [{ type: Types.ObjectId, ref: Category.name }], default: [] })
+  ancestorIds: Category[]
 
   @Prop({ required: true, type: [{ type: Types.ObjectId, ref: Keyword.name }] })
   keywords: Keyword[]

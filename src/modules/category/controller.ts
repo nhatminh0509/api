@@ -22,7 +22,7 @@ export class CategoryController {
   @Post()
   @UseAuthGuard(Permissions.CREATE_CATEGORY)
   create(@CurrentOrg() org, @Body() body: CreateCategoryInput) {
-    return this.categoryService.create({ ...body, orgSlug: org?.slug });
+    return this.categoryService.create({ ...body, orgId: org?._id });
   }
   
   @Get()

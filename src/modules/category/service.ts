@@ -27,8 +27,8 @@ export class CategoryService {
   async create(input: CreateCategoryInput) {
     try {
       let parent = null
-      if (input.parentSlug) {
-        parent = await this.findOne(input.parentSlug)
+      if (input.parentId) {
+        parent = await this.findOne(input.parentId)
       }
       const slug = await generateSlugUnique(this.categoryModel, input.name)
       const keywords = input.keywords
@@ -36,7 +36,7 @@ export class CategoryService {
       delete input.keywords
       if (keywords && keywords?.length > 0) {
         resKeywords = await this.keywordService.newKeyword({
-          orgSlug: input.orgSlug,
+          orgId: input.orgId,
           keys: keywords
         })
       }
@@ -45,10 +45,10 @@ export class CategoryService {
         image: input.image,
         description: input.description,
         others: input.others,
-        orgSlug: input.orgSlug,
+        orgId: new Types.ObjectId(input.orgId),
         shortName: input.shortName,
-        parentSlug: parent ? parent.slug : null,
-        ancestorsSlug: parent ? [parent?.slug, ...parent?.ancestorsSlug] : [],
+        parentId: parent ? new Types.ObjectId(parent._id) : null,
+        ancestorIds: parent ? [new Types.ObjectId(parent._id), ...parent?.ancestorIds] : [],
         keywords: resKeywords,
         slug
       })
@@ -91,7 +91,6 @@ export class CategoryService {
       limit: Number(limit)
     }
   }
-
 
   async findByKeywords(query: QueryListByKeywords) {
     const { keywords, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
@@ -174,5 +173,17 @@ export class CategoryService {
     } catch (error) {
       throw HTTP_STATUS.BAD_REQUEST(mongoError(error))
     }
+  }
+
+  async convertSlugToId(slugs: string[]) {
+    const aggregate = new AggregateFind(this.categoryModel)
+
+    aggregate.filter('slug', slugs)
+
+    aggregate.select(['_id'])
+
+    const { data } = await aggregate.exec()
+
+    return data.map(item => new Types.ObjectId(item._id))
   }
 }

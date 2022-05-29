@@ -1,4 +1,4 @@
-import { generateSlugNonShortId } from './../common/function';
+import { generateSlugNonShortId, generateSlugUnique } from './../common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
@@ -46,8 +46,8 @@ export class AuthService {
     if (user.status !== UserStatus.Active) {
       throw HTTP_STATUS.FORBIDDEN('User not active')
     }
-    // TODO
-    const org = await this.orgService.findOneByDomain('http://localhost:5500')
+ 
+    const org = await this.orgService.findOneByDomain(config.ENABLE_DEVTOOL_MODULE ? 'http://localhost:5500' : domain)
 
     let role = null
     if (org && user.roles) {
@@ -107,9 +107,10 @@ export class AuthService {
   }
 
   async createRoles (input: CreateRoleInput) {
+    const org = await this.orgService.findOne(input.orgId)
     const model = new this.roleModel({
       ...input,
-      slug: generateSlugNonShortId(input.name, input.orgSlug)
+      slug: await generateSlugUnique(this.roleModel, input.name, org?.slug)
     })
     const modelCreated = await model.save()
     return modelCreated
