@@ -32,6 +32,7 @@ export class User {
   @Prop({ enum: UserStatus, type: String, default: UserStatus.Pending, index: true })
   status: UserStatus
 
+  // { domain: roleSlug }
   @Prop({ type: Object, default: {} })
   roles: object
 

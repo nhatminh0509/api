@@ -48,8 +48,8 @@ export const CategorySchema = SchemaFactory.createForClass(Category).index({ nam
 CategorySchema.plugin(MongooseDelete, { overrideMethods: 'all' })
 CategorySchema.virtual('products', {
   ref: 'Product',
-  localField: '_id',
-  foreignField: 'categoryId',
+  localField: 'slug',
+  foreignField: 'categorySlug',
   justOne: false
 })
 CategorySchema.virtual('ancestors', {

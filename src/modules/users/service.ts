@@ -5,7 +5,7 @@ import { SoftDeleteModel } from 'mongoose-delete';
 import { checkObjectId } from 'src/core/common/function';
 import HTTP_STATUS from 'src/core/common/httpStatus';
 import { User, UserDocument, UserStatus } from './model';
-import { CreateUserInput, QueryListUser, UpdateUserInput } from './type';
+import { CreateUserInput, QueryListUser, UpdateUserInput, UpdateUserRoleInput } from './type';
 import * as bcrypt from 'bcrypt'
 import { SORT_DIRECTION } from 'src/core/common/constants';
 
@@ -78,6 +78,21 @@ export class UsersService {
         10,
       )
     }
+    if (checkObjectId(field)){
+      user = await this.userModel.findByIdAndUpdate(field, updateInput)
+    } else if (isEmail(field)) {
+      user = await this.userModel.findOneAndUpdate({ email: field }, updateInput)
+    } else {
+      user = await this.userModel.findOneAndUpdate({ username: field }, updateInput)
+    }
+    if (!user) throw HTTP_STATUS.NOT_FOUND('User not found')
+    const updated = await this.findOne(user._id)
+    return updated
+  }
+
+  async updateRole(field: string, input: UpdateUserRoleInput) {
+    let user = null
+    let updateInput = { ...input }
     if (checkObjectId(field)){
       user = await this.userModel.findByIdAndUpdate(field, updateInput)
     } else if (isEmail(field)) {

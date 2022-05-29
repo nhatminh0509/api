@@ -3,10 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import HTTP_STATUS from 'src/core/common/httpStatus';
-import { generateSlug } from 'src/core/common/function';
+import { generateSlugNonShortId } from 'src/core/common/function';
 import { Org, OrgDocument } from './model';
 import { CreateOrgInput, QueryListOrg, UpdateOrgInput } from './type';
-import { mongoose } from '@typegoose/typegoose';
 import { SORT_DIRECTION } from 'src/core/common/constants';
 
 @Injectable()
@@ -18,7 +17,7 @@ export class OrgsService {
   async create(input: CreateOrgInput) {
     const org = new this.orgModel({
       ...input,
-      slug: generateSlug(input.name)
+      slug: generateSlugNonShortId(input.name)
     })
     const orgCreated = await org.save()
     return orgCreated
@@ -67,10 +66,7 @@ export class OrgsService {
   
   async findOneByDomain(domain: string) {
     console.log(domain)
-    const org = await this.orgModel.findOne({ domain }).populate({
-      path: 'owner',
-      match: { _id: { $ne: null }}
-    }).lean()
+    const org = await this.orgModel.findOne({ domain }).lean()
     if (!org) throw HTTP_STATUS.NOT_FOUND('Domain not found')
     return org
   }
@@ -78,15 +74,13 @@ export class OrgsService {
   async findOne(slugOrId: string) {
     let org = null
     if (isValidObjectId(slugOrId)){
-      org = await this.orgModel.findById(slugOrId).populate({
-        path: 'owner',
-        match: { _id: { $ne: null }}
-      }).lean()
+      org = await this.orgModel.findById(slugOrId).lean()
     } else {
-      org = await this.orgModel.findOne({ slug: slugOrId }).populate({
-        path: 'owner',
-        match: { _id: { $ne: null }}
-      }).lean()
+      org = await this.orgModel.findOne({ slug: slugOrId }).lean()
+      // org = await this.orgModel.findOne({ slug: slugOrId }).populate({
+      //   path: 'owner',
+      //   match: { _id: { $ne: null }}
+      // }).lean()
     }
     if (!org) throw HTTP_STATUS.NOT_FOUND('Org not found')
     return org
@@ -97,7 +91,7 @@ export class OrgsService {
     let org = null
     let updateData = { ...updateInput } as any
     if (updateData.name) {
-      updateData.slug = generateSlug(updateData.name)
+      updateData.slug = generateSlugNonShortId(updateData.name)
     }
     if (isValidObjectId(slugOrId)){
       org = await this.orgModel.findByIdAndUpdate(slugOrId, updateData)

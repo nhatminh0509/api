@@ -8,11 +8,11 @@ export type RelationshipCategoryBrandDocument = RelationshipCategoryBrand & Mong
 
 @Schema({ timestamps: true })
 export class RelationshipCategoryBrand {
-  @Prop({ required: true, index: true, type: String, ref: Category.name })
-  categorySlug: string
+  @Prop({ required: true, index: true, type: Types.ObjectId, ref: Category.name })
+  categoryId: string
   
-  @Prop({ required: true, index: true, type: String, ref: Brand.name })
-  brandSlug: string
+  @Prop({ required: true, index: true, type: Types.ObjectId, ref: Brand.name })
+  brandId: string
 }
 
 export const RelationshipCategoryBrandSchema = SchemaFactory.createForClass(RelationshipCategoryBrand)

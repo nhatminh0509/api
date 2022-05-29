@@ -13,7 +13,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { UseAuthGuard } from 'src/core/auth/auth.decorator';
 import Permissions from 'src/core/permissions';
 import { UsersService } from './service';
-import { CreateUserInput, QueryListUser, UpdateUserInput } from './type';
+import { CreateUserInput, QueryListUser, UpdateUserInput, UpdateUserRoleInput } from './type';
 
 @ApiTags('Users')
 @Controller('users')
@@ -41,6 +41,12 @@ export class UsersController {
   @UseAuthGuard(Permissions.UPDATE_USER)
   update(@Param('id') slugOrId: string, @Body() updateInput: UpdateUserInput) {
     return this.usersService.update(slugOrId, updateInput)
+  }
+  
+  @Put('/update-roles/:id')
+  @UseAuthGuard(Permissions.UPDATE_USER_ROLE)
+  updateRole(@Param('id') slugOrId: string, @Body() updateInput: UpdateUserRoleInput) {
+    return this.usersService.updateRole(slugOrId, updateInput)
   }
   
   @Delete(':id')

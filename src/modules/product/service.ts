@@ -31,8 +31,6 @@ export class ProductsService {
     })
     const product = new this.productModel({
       ...input,
-      categoryId: new Types.ObjectId(input.categoryId),
-      brandId: new Types.ObjectId(input.brandId),
       slug: generateSlug(input.name),
       keywords: resKeywords
     })
@@ -49,12 +47,14 @@ export class ProductsService {
 
     aggregate.joinModel('categories', 'slug', 'categorySlug', 'category', true)
 
+    aggregate.joinModel('keywords', '_id', 'category.keywords', 'category.keys')
+
     if (searchText) {
-      aggregate.searchTextWithRegex(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key'])
+      aggregate.searchTextWithRegex(searchText, ['name', 'shortName', 'description', 'keys.subKey', 'keys.key', 'category.keys.key', 'category.keys.subKey'])
     }
 
     if (categories) {
-      aggregate.filter('categorySlug', categories)
+      aggregate.filter(['categorySlug', 'category.ancestorsSlug'], categories)
     }
 
     if (brands) {
@@ -63,7 +63,7 @@ export class ProductsService {
 
     aggregate.sort(orderBy, direction)
 
-    aggregate.select(['name', 'description', 'shortName', 'slug', 'keys.key', 'category.name'])
+    aggregate.select(['name', 'description', 'shortName', 'slug', 'keys.key', 'category.name', 'category.keys.key', 'category.keys.subKey'])
 
     aggregate.paginate(skip, limit)
 

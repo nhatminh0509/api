@@ -24,8 +24,8 @@ class AggregateFind {
     }
   }
 
-  filter = (field: string, values: any[] | any, convertToObjectId?: boolean) => {
-    this.pipelineStages.push(filterAggregate(field, values, convertToObjectId))
+  filter = (fields: string | string[], values: any[] | any, convertToObjectId?: boolean) => {
+    this.pipelineStages.push(filterAggregate(fields, values, convertToObjectId))
   }
 
   select = (keysSelect: string[], keysUnselect?: string[]) => {

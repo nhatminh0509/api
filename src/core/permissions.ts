@@ -18,6 +18,7 @@ enum Permissions  {
     READ_USER = 'Read_User',
     CREATE_USER = 'Create_User',
     UPDATE_USER = 'Update_User',
+    UPDATE_USER_ROLE = 'Update_UserRole',
     DELETE_USER = 'Delete_User',
 
     CREATE_BRAND = 'Create_Brand',

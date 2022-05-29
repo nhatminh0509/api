@@ -1,3 +1,4 @@
+import { generateSlugNonShortId } from './../common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
@@ -50,7 +51,10 @@ export class AuthService {
 
     let role = null
     if (org && user.roles) {
-      role = await this.roleModel.findById(user.roles[org._id]).lean()
+      role = await this.roleModel.findOne({
+        orgSlug: org.slug,
+        slug: user.roles[org.domain]
+      }).lean()
       delete user.roles
       user.permissions = role?.permissions || []
     }
@@ -87,8 +91,8 @@ export class AuthService {
     const user = await this.userService.findOne(id)
     const org = await this.orgService.findOneByDomain(domain)
 
-    if (user && user.roles && org && org._id && user.roles[org._id]) {
-      const role = await this.roleModel.findById(user.roles[org._id])
+    if (user && user.roles && org && org._id && user.roles[org.domain]) {
+      const role = await this.roleModel.findOne({ slug: user.roles[org.domain] })
       if (role && role.permissions && Array.isArray(role.permissions)) {
         if(role.permissions.includes(permissions) || role.permissions.includes(Permissions.ALL)) {
           return true
@@ -105,6 +109,7 @@ export class AuthService {
   async createRoles (input: CreateRoleInput) {
     const model = new this.roleModel({
       ...input,
+      slug: generateSlugNonShortId(input.name, input.orgSlug)
     })
     const modelCreated = await model.save()
     return modelCreated

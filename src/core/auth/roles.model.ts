@@ -11,6 +11,9 @@ export class Role {
   @Prop({ required: true, index: 'text' })
   name: string
   
+  @Prop({ required: true, type: String, unique: true })
+  slug: string
+
   @Prop({ default: [] })
   permissions: Permissions[]
 

@@ -13,25 +13,29 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { FilesModule } from 'src/modules/files/module';
 import { AuthModule } from './auth/auth.module';
 import { KeywordModule } from 'src/modules/keyword/module';
+import { DevtoolModule } from 'src/modules/devtool/module';
 import config from './common/config';
 
+const imports = [
+  AuthModule,
+  OrgsModule,
+  UsersModule, 
+
+  BrandsModule,
+  CategoryModule,
+  ProductsModule,
+  RelationshipCategoryBrandModule,
+  ...(config.ENABLE_DEVTOOL_MODULE ? [DevtoolModule] : []),
+
+  KeywordModule,
+  FilesModule,
+  SearchModule,
+  
+  MongooseModule.forRoot(config.MONGO_URI),
+]
+
 @Module({
-  imports: [
-    AuthModule,
-    OrgsModule,
-    UsersModule, 
-
-    BrandsModule,
-    CategoryModule,
-    ProductsModule,
-    RelationshipCategoryBrandModule,
-
-    KeywordModule,
-    FilesModule,
-    SearchModule,
-    
-    MongooseModule.forRoot(config.MONGO_URI),
-  ],
+  imports,
   controllers: [AppController],
   providers: [AppService],
 })

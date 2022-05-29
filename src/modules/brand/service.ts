@@ -1,7 +1,6 @@
-import { generateSlugNonShortId } from './../../core/common/function';
+import { generateSlugNonShortId, generateSlugUnique } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Types } from 'mongoose';
 import { SoftDeleteModel } from 'mongoose-delete';
 import { checkObjectId, generateSlug } from 'src/core/common/function';
 import HTTP_STATUS from 'src/core/common/httpStatus';
@@ -22,17 +21,17 @@ export class BrandsService {
 
   async create(input: CreateBrandInput) {
     try {
-      const categoriesSlug = input.categoriesSlug
-      delete input.categoriesSlug
+      const categoryIds = input.categoryIds
+      delete input.categoryIds
       const model = new this.brandModel({
         ...input,
-        slug: generateSlugNonShortId(input.name)
+        slug: await generateSlugUnique(this.brandModel, input.name)
       })
       const modelCreated = await model.save()
-      if (modelCreated && categoriesSlug &&categoriesSlug?.length > 0) {
+      if (modelCreated && categoryIds && categoryIds?.length > 0) {
         await this.relationshipCategoryBrandService.updateBrand({
-          brandSlug: modelCreated.slug,
-          categoriesSlug: input.categoriesSlug
+          brandId: modelCreated._id,
+          categoryIds
         })
       }
       return modelCreated
@@ -82,23 +81,19 @@ export class BrandsService {
 
   async update(field: string, input: UpdateBrandInput) {
     try {
-      let model = null
-      let categoriesSlug = input.categoriesSlug
-      delete input.categoriesSlug
+      let model = await this.findOne(field)
+      if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
+      let categoryIds = input.categoryIds
+      delete input.categoryIds
       let updateInput = { ...input } as any
       if (updateInput.name) {
-        updateInput.slug = generateSlugNonShortId(updateInput.name)
+        updateInput.slug = await generateSlugUnique(this.brandModel, updateInput.name, model?.slug)
       }
-      if (checkObjectId(field)){
-        model = await this.brandModel.findByIdAndUpdate(field, updateInput)
-      } else {
-        model = await this.brandModel.findOneAndUpdate({ slug: field }, updateInput)
-      }
-      if (!model) throw HTTP_STATUS.NOT_FOUND('Brand not found')
-      if (categoriesSlug) {
+      model = await this.brandModel.findByIdAndUpdate(model._id, updateInput)
+      if (categoryIds) {
         await this.relationshipCategoryBrandService.updateBrand({
-          brandSlug: model.slug,
-          categoriesSlug
+          brandId: model._id,
+          categoryIds
         })
       }
       const updated = await this.findOne(model._id)

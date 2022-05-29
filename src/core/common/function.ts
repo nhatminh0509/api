@@ -12,7 +12,10 @@ export const generateSlug = (field = ''): string => {
   return `${field.split(' ').join('-')}-${generateShortId()}`
 }
 
-export const generateSlugNonShortId = (field = ''): string => {
+export const generateSlugNonShortId = (field = '', prefix?: string): string => {
+  if (prefix) {
+    return removeVietnameseTones(`${prefix}-${field.split(' ').join('-')}`, false)
+  }
   return `${field.split(' ').join('-')}`
 }
 
@@ -131,38 +134,69 @@ export const searchTextWithRegexAggregate = (search: string | undefined | null, 
   return result
 }
 
-export const filterAggregate = (field: string, values: any[] | any, convertToObjectId?: boolean) => {
-  const result: any = {
+export const filterAggregate = (fields: string | string[], values: any[] | any, convertToObjectId?: boolean) => {
+  const result: PipelineStage = {
     $match: {}
   }
 
-  if (Array.isArray(values)) {
-    let filter
-    if (convertToObjectId) {
-      filter = values.map(id => checkObjectId(id) ? convertStringToObjectId(id) : null ).filter(item => item !== null)
-    } else {
-      filter = values
-    }
-    result.$match[field] = {
-      $in: filter
-    }
-  } else {
-    let filter
-    if (typeof values === 'string' && values.includes(',')) {
-      filter = values.trim().split(' ').join('').split(',')
-      console.log(filter)
-      return filterAggregate(field, filter, convertToObjectId)
-    } else {
+  if (Array.isArray(fields)) {
+    result.$match.$or = []
+    if (Array.isArray(values)) {
+      // [value1, value2]
+      let filter
       if (convertToObjectId) {
-        filter = checkObjectId(values) ? convertStringToObjectId(values) : null
+        filter = values.map(id => checkObjectId(id) ? convertStringToObjectId(id) : null ).filter(item => item !== null)
       } else {
         filter = values
       }
-      if (filter) {
-        result.$match[field] = filter;
+      fields.map(field => {
+        result.$match.$or.push({
+          [field]: {
+            $in: filter
+          }
+        })
+      })
+    } else {
+      let filter
+      if (typeof values === 'string' && values.includes(',')) {
+        // value1, value2
+        filter = values.trim().split(' ').join('').split(',')
+        return filterAggregate(fields, filter, convertToObjectId)
+      } else {
+        // value
+        return filterAggregate(fields, [values], convertToObjectId)
+      }
+    }
+  } else {
+    if (Array.isArray(values)) {
+      let filter
+      if (convertToObjectId) {
+        filter = values.map(id => checkObjectId(id) ? convertStringToObjectId(id) : null ).filter(item => item !== null)
+      } else {
+        filter = values
+      }
+      result.$match[fields] = {
+        $in: filter
+      }
+    } else {
+      let filter
+      if (typeof values === 'string' && values.includes(',')) {
+        filter = values.trim().split(' ').join('').split(',')
+        console.log(filter)
+        return filterAggregate(fields, filter, convertToObjectId)
+      } else {
+        if (convertToObjectId) {
+          filter = checkObjectId(values) ? convertStringToObjectId(values) : null
+        } else {
+          filter = values
+        }
+        if (filter) {
+          result.$match[fields] = filter;
+        }
       }
     }
   }
+
   return result
 }
 
@@ -182,4 +216,24 @@ export const sortAggregate = (orderBy: string | string[], direction: string | st
     })
     return result
   }
+}
+
+export const generateSlugUnique = async (model, field, oldSlug?: string) => {
+  let slug = ''
+  let slugCheck = null
+  let index = 0
+  if (oldSlug === generateSlugNonShortId(field)) {
+    return oldSlug    
+  } else {
+    do {
+      if (index === 0) {
+        slug = generateSlugNonShortId(field)
+      } else {
+        slug = `${generateSlugNonShortId(field)}-${index}`
+      }
+      index++
+      slugCheck = await model.findOne({ slug })
+    } while (slugCheck?._id)
+  }
+  return slug
 }

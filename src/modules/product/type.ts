@@ -42,11 +42,11 @@ export class CreateProductInput {
     
     @IsNotEmpty()
     @ApiProperty({ required: true })
-    categoryId: string
+    categorySlug: string
     
     @IsNotEmpty()
     @ApiProperty({ required: true })
-    brandId: string
+    brandSlug: string
 
     @ApiProperty({ required: true, nullable: false })
     orgSlug: string

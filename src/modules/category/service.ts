@@ -1,5 +1,5 @@
 import mongoError from 'src/core/common/mongoError';
-import { generateSlugNonShortId } from './../../core/common/function';
+import { generateSlugNonShortId, generateSlugUnique } from './../../core/common/function';
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
@@ -30,12 +30,16 @@ export class CategoryService {
       if (input.parentSlug) {
         parent = await this.findOne(input.parentSlug)
       }
+      const slug = await generateSlugUnique(this.categoryModel, input.name)
       const keywords = input.keywords
+      let resKeywords = []
       delete input.keywords
-      const resKeywords = await this.keywordService.newKeyword({
-        orgSlug: input.orgSlug,
-        keys: keywords
-      })
+      if (keywords && keywords?.length > 0) {
+        resKeywords = await this.keywordService.newKeyword({
+          orgSlug: input.orgSlug,
+          keys: keywords
+        })
+      }
       const model = new this.categoryModel({
         name: input.name,
         image: input.image,
@@ -46,13 +50,13 @@ export class CategoryService {
         parentSlug: parent ? parent.slug : null,
         ancestorsSlug: parent ? [parent?.slug, ...parent?.ancestorsSlug] : [],
         keywords: resKeywords,
-        slug: generateSlugNonShortId(input.name)
+        slug
       })
       const modelCreated = await model.save()
-      if (modelCreated && input.brandsSlug && input.brandsSlug.length > 0) {
+      if (modelCreated && input.brandIds && input.brandIds.length > 0) {
         await this.relationshipCategoryBrandService.updateCategory({
-          categorySlug: modelCreated.slug,
-          brandsSlug: input.brandsSlug
+          categoryId: modelCreated._id,
+          brandIds: input.brandIds
         })
       }
       return modelCreated  
@@ -125,26 +129,22 @@ export class CategoryService {
     }
   }
 
-
   async update(field: string, input: UpdateCategoryInput) {
     try {
-      let model = null
-      let brandsSlug = input.brandsSlug
-      delete input.brandsSlug   
+      let model = await this.findOne(field)
+      if (!model) throw HTTP_STATUS.NOT_FOUND('Category not found')
+      let brandIds = input.brandIds
+      delete input.brandIds   
       let updateInput = { ...input } as any
       if (updateInput.name) {
-        updateInput.slug = generateSlugNonShortId(updateInput.name)
+        const slug = await generateSlugUnique(this.categoryModel, updateInput.name, model?.slug)
+        updateInput.slug = slug
       }
-      if (checkObjectId(field)){
-        model = await this.categoryModel.findByIdAndUpdate(field, updateInput)
-      } else {
-        model = await this.categoryModel.findOneAndUpdate({ slug: field }, updateInput)
-      }
-      if (!model) throw HTTP_STATUS.NOT_FOUND('Category not found')
-      if (brandsSlug) {
+      model = await this.categoryModel.findByIdAndUpdate(model._id, updateInput)
+      if (brandIds) {
         await this.relationshipCategoryBrandService.updateCategory({
-          categorySlug: model?.slug,
-          brandsSlug
+          categoryId: model?._id,
+          brandIds
         })
       }
       const updated = await this.categoryModel.findById(model._id)

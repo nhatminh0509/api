@@ -36,7 +36,7 @@ export class AuthGuard implements CanActivate {
           request.userId = userId
     
           if (!userId) throw HTTP_STATUS.FORBIDDEN('Forbidden resource: User Id not found')
-    
+
           const user = await this.userService.findOne(userId)
           // TODO
           // const org = await this.orgService.findOneByDomain(request?.headers?.origin)

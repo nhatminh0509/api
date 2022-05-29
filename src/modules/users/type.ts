@@ -44,8 +44,8 @@ export class CreateUserInput {
     @ApiProperty({ required: true })
     phone: string
 
-    @ApiProperty({ required: false })
-    roles?: object
+    // @ApiProperty({ required: false })
+    // roles?: object
 }
 
 export class UpdateUserInput {
@@ -67,9 +67,13 @@ export class UpdateUserInput {
     @ApiProperty({ required: false })
     phone?: string
 
-    @ApiProperty({ required: false })
-    roles?: object
+    // @ApiProperty({ required: false })
+    // roles?: object
     
     @ApiProperty({ required: false, enum: UserStatus })
     status?: UserStatus
+}
+export class UpdateUserRoleInput {
+    @ApiProperty({ required: false })
+    roles?: object
 }

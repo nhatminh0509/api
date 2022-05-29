@@ -20,14 +20,11 @@ export class CreateRoleInput {
   @ApiProperty({ required: true, default: 0 })
   priority: number
 
-  @ApiProperty({ required: false, default: null })
+  @ApiProperty({ required: true, default: null })
   orgSlug?: string
 }
 
 export class UpdateRoleInput {
-  @ApiProperty({ required: false })
-  name?: string
-
   @ApiProperty({ required: false })
   permissions?: Permissions[]
 

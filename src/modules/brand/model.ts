@@ -36,7 +36,7 @@ export const BrandSchema = SchemaFactory.createForClass(Brand).index({ name: 'te
 BrandSchema.plugin(MongooseDelete, { overrideMethods: 'all' })
 BrandSchema.virtual('products', {
   ref: 'Product',
-  localField: '_id',
-  foreignField: 'brandId',
+  localField: 'slug',
+  foreignField: 'brandSlug',
   justOne: false
 })
