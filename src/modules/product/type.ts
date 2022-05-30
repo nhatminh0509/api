@@ -24,6 +24,7 @@ export class QueryListProduct {
     direction?: SORT_DIRECTION
 }
 
+
 export class CreateProductInput {
     @IsNotEmpty()
     @ApiProperty({ required: true })

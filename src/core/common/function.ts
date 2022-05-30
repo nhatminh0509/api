@@ -102,7 +102,7 @@ export const select = (keysSelect: string[], keysUnselect?: string[]) => {
     result.$project[key] = 1
   })
   
-  keysUnselect?.map(key => {
+  keysSelect.length > 0 && keysUnselect?.map(key => {
     result.$project[key] = 0
   })
 

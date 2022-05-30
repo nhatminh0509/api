@@ -46,7 +46,7 @@ export class ProductsService {
   }
 
   async findAll(query: QueryListProduct) {
-    const { categories, brands ,searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC } = query
+    const { categories, brands ,searchText, skip = 0, limit = 20, orderBy = 'createdAt', direction = SORT_DIRECTION.DESC, ...restQuery } = query
 
     const aggregate = new AggregateFind(this.productModel)
 
@@ -71,8 +71,16 @@ export class ProductsService {
     }
 
     aggregate.sort(orderBy, direction)
+    
+    if (Object.keys(restQuery).length > 0) {
+      Object.keys(restQuery).map(key => {
+        aggregate.filter(key, restQuery[key])
+      })
+    }
+    
+    aggregate.select(['name', 'description', 'shortName', 'slug', 'category.name', 'category.slug'])
 
-    aggregate.select(['name', 'description', 'shortName', 'slug', 'keys.key', 'category.name', 'category.keys.key', 'category.keys.subKey'])
+
 
     aggregate.paginate(skip, limit)
 
