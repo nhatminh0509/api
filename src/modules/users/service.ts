@@ -18,8 +18,8 @@ export class UsersService {
 
   async create(input: CreateUserInput) {
     let newInput = {
-      ...input,
-      status: UserStatus.Pending
+      ...input, // TODO Pending status
+      status: UserStatus.Active
     }
     if (input.password) {
       newInput.password = bcrypt.hashSync(
@@ -114,7 +114,8 @@ export class UsersService {
         address,
         messageHash: message,
         messageHashTime: now.getTime(),
-        status: UserStatus.Pending
+        // TOdo pending status
+        status: UserStatus.Active
       }
       const model = new this.userModel(newInput)
       const userCreated = await model.save()

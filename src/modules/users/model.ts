@@ -32,13 +32,13 @@ export class User {
   @Prop({ required: false, unique: true })
   phone: string
 
-  @Prop({ required: false, unique: true, default: null })
+  @Prop({ required: false, default: null })
   messageHash: string
   
-  @Prop({ required: false, unique: true, default: null })
+  @Prop({ required: false, default: null })
   messageHashTime: string
 
-  @Prop({ enum: UserStatus, type: String, default: UserStatus.Pending, index: true })
+  @Prop({ enum: UserStatus, type: String, default: UserStatus.Active, index: true })
   status: UserStatus
 
   // { domain: roleSlug }
