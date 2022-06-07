@@ -3,9 +3,6 @@ import { Keyword } from '../keyword/model';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Types } from 'mongoose'
 import * as MongooseDelete from 'mongoose-delete'
-import { Org } from '../orgs/model'
-import { Brand } from '../brand/model';
-import { Category } from '../category/model';
 import { Type } from 'class-transformer';
 import { Product } from './product.model';
 

@@ -8,7 +8,10 @@ export type OrgDocument = Org & MongooseDelete.SoftDeleteDocument
 export class Org {
   @Prop({ required: true, index: 'text' })
   name: string
-  
+
+  @Prop({ required: true })
+  image: string
+
   @Prop({ required: true, unique: true })
   domain: string
   

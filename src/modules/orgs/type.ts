@@ -32,6 +32,10 @@ export class CreateOrgInput {
     
     @IsNotEmpty()
     @ApiProperty({ required: true })
+    image: string
+    
+    @IsNotEmpty()
+    @ApiProperty({ required: true })
     domain: string
     
     @IsNotEmpty()
@@ -45,6 +49,9 @@ export class CreateOrgInput {
 export class UpdateOrgInput {
     @ApiProperty({ required: false })
     name?: string
+    
+    @ApiProperty({ required: false })
+    image?: string
     
     @ApiProperty({ required: false })
     domain?: string

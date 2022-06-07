@@ -22,7 +22,8 @@ const seedData = {
     domain: 'http://localhost:5500',
     name: 'dev tools',
     owner: 'nhatminh0509',
-    slug: 'dev-tools'
+    slug: 'dev-tools',
+    image: 'image'
   }
 }
 
