@@ -10,6 +10,11 @@ export class SignInInput {
   password: string
 }
 
+export class SignatureInput {
+  @ApiProperty({ required: true })
+  signature: string
+}
+
 export class CreateRoleInput {
   @ApiProperty({ required: true })
   name: string

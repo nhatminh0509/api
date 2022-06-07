@@ -12,7 +12,7 @@ import { ApiTags } from '@nestjs/swagger'
 import Permissions from '../permissions'
 import { CurrentOrgDomain, UseAuthGuard } from './auth.decorator'
 import { AuthService } from './auth.service'
-import { CreateRoleInput, QueryListRole, SignInInput, UpdateRoleInput } from './auth.type'
+import { CreateRoleInput, QueryListRole, SignatureInput, SignInInput, UpdateRoleInput } from './auth.type'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -22,6 +22,11 @@ export class AuthController {
   @Post('/sign-in')
   signIn(@CurrentOrgDomain() domain, @Body() body: SignInInput) {
     return this.authService.signIn(domain, body)
+  }
+  
+  @Post('/sign-in-with-signature')
+  signInWithSignature(@CurrentOrgDomain() domain, @Body() body: SignatureInput) {
+    return this.authService.signInWithSignature(domain, body)
   }
   
   @Get('/permissions')

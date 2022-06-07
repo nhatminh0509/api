@@ -1,3 +1,4 @@
+import { ethers, Wallet } from 'ethers';
 import { forwardRef, Inject, OnApplicationBootstrap } from "@nestjs/common";
 import { AuthService } from "src/core/auth/auth.service";
 import { Logger } from "src/core/common/Logger";
@@ -29,6 +30,8 @@ export class DevtoolService implements OnApplicationBootstrap {
   async devToolsBootstrap() {
     try {
       // Find not found => insert data
+      // const providers = new ethers.providers.JsonRpcProvider('http://95.179.192.46:9650/ext/bc/21Z7pN9Z6VfmMo8jjhDQYyYJS5MB7MftZSuKrmenhmwADCWWJH/rpc')
+      // const wallet = new Wallet()
       await this.orgService.findOne(seedData.org.slug)
     } catch (_) {
       // Handle insert seed data
