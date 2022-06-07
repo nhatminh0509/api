@@ -37,6 +37,11 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
   
+  @Get('/getMessageHash/:address')
+  getMessageHash(@Param('address') address: string) {
+    return this.usersService.getMessageHash(address);
+  }
+  
   @Put(':id')
   @UseAuthGuard(Permissions.UPDATE_USER)
   update(@Param('id') slugOrId: string, @Body() updateInput: UpdateUserInput) {

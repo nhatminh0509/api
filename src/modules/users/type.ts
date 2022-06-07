@@ -21,28 +21,27 @@ export class QueryListUser {
 }
 
 export class CreateUserInput {
-    @IsNotEmpty()
-    @ApiProperty({ required: true })
-    displayName: string
+    @ApiProperty({ required: false })
+    displayName?: string
+    
+    @ApiProperty({ required: false })
+    username?: string
+
+    @ApiProperty({ required: false })
+    address?: string
     
     @IsNotEmpty()
-    @ApiProperty({ required: true })
-    username: string
-    
-    @IsNotEmpty()
-    @ApiProperty({ required: true })
-    password: string
+    @ApiProperty({ required: false })
+    password?: string
     
     @ApiProperty({ required: false })
     avatar?: string
     
-    @IsNotEmpty()
-    @ApiProperty({ required: true })
-    email: string
+    @ApiProperty({ required: false })
+    email?: string
     
-    @IsNotEmpty()
-    @ApiProperty({ required: true })
-    phone: string
+    @ApiProperty({ required: false })
+    phone?: string
 
     // @ApiProperty({ required: false })
     // roles?: object

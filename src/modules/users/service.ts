@@ -8,6 +8,7 @@ import { User, UserDocument, UserStatus } from './model';
 import { CreateUserInput, QueryListUser, UpdateUserInput, UpdateUserRoleInput } from './type';
 import * as bcrypt from 'bcrypt'
 import { SORT_DIRECTION } from 'src/core/common/constants';
+import { ethers } from 'ethers';
 
 @Injectable()
 export class UsersService {
@@ -16,14 +17,17 @@ export class UsersService {
   }
 
   async create(input: CreateUserInput) {
-    const model = new this.userModel({
+    let newInput = {
       ...input,
-      password: bcrypt.hashSync(
+      status: UserStatus.Pending
+    }
+    if (input.password) {
+      newInput.password = bcrypt.hashSync(
         input.password || '@admin',
         10,
-      ),
-      status: UserStatus.Pending
-    })
+      )
+    }
+    const model = new this.userModel(newInput)
     const userCreated = await model.save()
     return userCreated
   }
@@ -61,6 +65,8 @@ export class UsersService {
       model = await this.userModel.findById(field)
     } else if (isEmail(field)) {
       model = await this.userModel.findOne({ email: field })
+    } else if (ethers.utils.isAddress(field)) {
+      model = await this.userModel.findOne({ address: field })
     } else {
       model = await this.userModel.findOne({ username: field })
     }
@@ -68,6 +74,45 @@ export class UsersService {
     return model
   }
 
+
+  async getMessageHash(address: string) {
+    try {
+      if (!ethers.utils.isAddress(address)) {
+        throw HTTP_STATUS.BAD_REQUEST('Address invalid')
+      }
+      const now = new Date()
+      const message = `Chào ${address} đến hệ thống của chúng tôi, bạn hãy dùng mã này để ký, mã có giá trị trong vòng 24h kể từ ${now.getDate()}/${now.getMonth()}/${now.getFullYear()} ${now.getHours()}:${now.getMinutes()}`
+      let user = await this.userModel.findOne({ address })
+      if (user) {
+        const updated = await this.userModel.findOneAndUpdate({ address }, {
+          messageHash: message,
+          messageHashTime: now.getTime()
+        })
+        if (!updated) {
+          throw HTTP_STATUS.NOT_FOUND('Can not get message')
+        }
+      } else {
+        let newInput = {
+          address,
+          messageHash: message,
+          messageHashTime: now.getTime(),
+          status: UserStatus.Pending
+        }
+        const model = new this.userModel(newInput)
+        const userCreated = await model.save()
+        console.log(userCreated)
+        if (!userCreated?._id) {
+          throw HTTP_STATUS.NOT_FOUND('Can not get message')
+        }
+      }
+      return {
+        message
+      }
+    } catch (error) {
+      console.log(error)
+      throw HTTP_STATUS.NOT_FOUND('Can not get message')
+    }
+  }
 
   async update(field: string, input: UpdateUserInput) {
     let user = null
