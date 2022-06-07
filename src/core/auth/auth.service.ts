@@ -134,6 +134,8 @@ export class AuthService {
       const token = await this.signAccountToken(userData)
 
       return { user: userData, token }
+    } else {
+      throw HTTP_STATUS.BAD_REQUEST('Signature expired')
     }
   }
 
