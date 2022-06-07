@@ -74,16 +74,20 @@ export class UsersService {
     return model
   }
 
+  async clearMessageHash(address: string) {
+    return await this.userModel.findOneAndUpdate({ address: { $regex: address, $options: 'i' } }, { messageHash: null, messageHashTime: null })
+  }
+
   async findOne(field: string) {
     let model = null
     if (checkObjectId(field)){
       model = await this.userModel.findById(field)
     } else if (isEmail(field)) {
-      model = await this.userModel.findOne({ email: field })
+      model = await this.userModel.findOne({ email: { $regex: field, $options: 'i' } })
     } else if (ethers.utils.isAddress(field)) {
-      model = await this.userModel.findOne({ address: field })
+      model = await this.userModel.findOne({ address: { $regex: field, $options: 'i' } })
     } else {
-      model = await this.userModel.findOne({ username: field })
+      model = await this.userModel.findOne({ username: { $regex: field, $options: 'i' } })
     }
     if (!model) throw HTTP_STATUS.NOT_FOUND('User not found')
     return model
@@ -102,7 +106,6 @@ export class UsersService {
         messageHash: message,
         messageHashTime: now.getTime()
       })
-      console.log(updated)
       if (!updated) {
         throw HTTP_STATUS.NOT_FOUND('Can not get message')
       }

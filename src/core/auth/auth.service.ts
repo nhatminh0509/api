@@ -89,50 +89,51 @@ export class AuthService {
     if (!findUser) {
       throw HTTP_STATUS.NOT_FOUND('User not found')
     }
-    const timeExpired = new Date(1654597791321).setDate(new Date(1654597791321).getDate() + 1)
+    const timeExpired = new Date(Number(findUser?.messageHashTime)).setDate(new Date(Number(findUser?.messageHashTime)).getDate() + 1)
+
     if (findUser.messageHashTime !== null && findUser.messageHash !== null && timeExpired > Date.now()) {
-    const digest = ethers.utils.arrayify(ethers.utils.hashMessage(findUser.messageHash));
-    const singer = ethers.utils.recoverAddress(digest, sig)
+      const digest = ethers.utils.arrayify(ethers.utils.hashMessage(findUser.messageHash));
+      const singer = ethers.utils.recoverAddress(digest, sig)
 
-    if (singer?.toLowerCase() !== address?.toLowerCase()) {
-      throw HTTP_STATUS.NOT_FOUND('Signature invalid')
-    }
+      if (singer?.toLowerCase() !== address?.toLowerCase()) {
+        throw HTTP_STATUS.NOT_FOUND('Signature invalid')
+      }
 
-    let user = await this.userService.findOne(address)
+      let user = await this.userService.findOne(address)
 
-    if (!user) {
-      throw HTTP_STATUS.NOT_FOUND('User not found')
-    }
+      if (!user) {
+        throw HTTP_STATUS.NOT_FOUND('User not found')
+      }
 
-    if (user.status !== UserStatus.Active) {
-      throw HTTP_STATUS.FORBIDDEN('User not active')
-    }
+      if (user.status !== UserStatus.Active) {
+        throw HTTP_STATUS.FORBIDDEN('User not active')
+      }
+      console.log(await this.userService.clearMessageHash(address))
+      const org = await this.orgService.findOneByDomain(config.ENABLE_DEVTOOL_MODULE ? 'http://localhost:5500' : domain)
 
-    const org = await this.orgService.findOneByDomain(config.ENABLE_DEVTOOL_MODULE ? 'http://localhost:5500' : domain)
+      let role = null
+      if (org && user.roles) {
+        role = await this.roleModel.findOne({
+          orgSlug: org.slug,
+          slug: user.roles[org.domain]
+        }).lean()
+        delete user.roles
+        user.permissions = role?.permissions || []
+      }
 
-    let role = null
-    if (org && user.roles) {
-      role = await this.roleModel.findOne({
-        orgSlug: org.slug,
-        slug: user.roles[org.domain]
-      }).lean()
-      delete user.roles
-      user.permissions = role?.permissions || []
-    }
+      const userData = {
+        _id: user?._id,
+        status: user?.status,
+        phone: user?.phone,
+        email: user?.email,
+        avatar: user?.avatar,
+        username: user?.username,
+        permissions: user?.permissions 
+      }
 
-    const userData = {
-      _id: user?._id,
-      status: user?.status,
-      phone: user?.phone,
-      email: user?.email,
-      avatar: user?.avatar,
-      username: user?.username,
-      permissions: user?.permissions 
-    }
+      const token = await this.signAccountToken(userData)
 
-    const token = await this.signAccountToken(userData)
-
-    return { user: userData, token }
+      return { user: userData, token }
     }
   }
 
