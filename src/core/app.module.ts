@@ -1,3 +1,4 @@
+import { TransactionLogModule } from './../modules/transaction-log/module';
 import { SearchModule } from './../modules/search/module';
 import { ProductsModule } from './../modules/product/module';
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
@@ -15,9 +16,16 @@ import { AuthModule } from './auth/auth.module';
 import { KeywordModule } from 'src/modules/keyword/module';
 import { DevtoolModule } from 'src/modules/devtool/module';
 import config from './common/config';
+import { SettingModule } from 'src/modules/settings/module';
+import { Web3Module } from 'src/modules/web3/module';
+import { NetworkModule } from 'src/modules/network/module';
 
 const imports = [
   AuthModule,
+  SettingModule,
+  Web3Module,
+  TransactionLogModule,
+  NetworkModule,
   OrgsModule,
   UsersModule, 
 

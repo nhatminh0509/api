@@ -4,6 +4,10 @@ enum Permissions  {
     FILE_UPLOAD = 'File_Upload',
 
     LIST_PERMISSIONS = 'List_Permissions',
+
+    CREATE_SETTING = 'Create_Setting',
+    UPDATE_SETTING = 'Update_Setting',
+    DELETE_SETTING = 'Delete_Setting',
     
     READ_ROLE = 'READ_ROLE',
     CREATE_ROLE = 'Create_Role',
