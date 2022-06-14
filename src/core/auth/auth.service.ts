@@ -35,7 +35,7 @@ export class AuthService {
   async signIn(domain, input: SignInInput) {
     const { userNameOrEmail, password } = input
 
-    let user = await this.userService.findOne(userNameOrEmail)
+    let user = await this.userService.findOne(userNameOrEmail.split(' ').join(''))
 
     if (!user) {
       throw HTTP_STATUS.NOT_FOUND('User not found')
